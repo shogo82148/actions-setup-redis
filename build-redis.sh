@@ -19,4 +19,4 @@ mkdir -p "$RUNNER_TEMP/dist"
 make install PREFIX="$RUNNER_TEMP/dist"
 
 cd "$RUNNER_TEMP/dist"
-tar czf "../redis-$REDIS_VERSION.tar.gz" .
+tar czf "../redis-bin.tar.gz" .
