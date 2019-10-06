@@ -1,16 +1,8 @@
-import * as core from '@actions/core';
-import {wait} from './wait'
+import * as core from "@actions/core";
 
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    console.log(`Waiting ${ms} milliseconds ...`)
-
-    core.debug((new Date()).toTimeString())
-    await wait(parseInt(ms));
-    core.debug((new Date()).toTimeString())
-
-    core.setOutput('time', new Date().toTimeString());
+    core.debug("TODO: implement me");
   } catch (error) {
     core.setFailed(error.message);
   }
