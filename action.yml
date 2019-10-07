@@ -1,10 +1,10 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'actions-setup-redis'
+description: 'setup redis database'
+author: 'Ichinose Shogo'
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  redis-version:
+    description: the version of redis
+    default: 5
 runs:
   using: 'node12'
-  main: 'lib/main.js'
+  main: 'lib/setup-redis.js'
