@@ -41,7 +41,13 @@ describe('installer tests', () => {
     const redisPath = await installer.getRedis('5.x');
     const cli = path.join(redisPath, 'redis-cli');
     await starter.startRedis(tempDir, redisPath, 6379);
-    const exitCode = await exec.exec(cli, ['-h', '127.0.0.1', '-p', '6379', 'shutdown']);
+    const exitCode = await exec.exec(cli, [
+      '-h',
+      '127.0.0.1',
+      '-p',
+      '6379',
+      'shutdown'
+    ]);
     expect(exitCode).toBe(0);
   }, 100000);
 });
