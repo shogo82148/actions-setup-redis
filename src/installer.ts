@@ -32,7 +32,7 @@ function determineVersion(version: string): string {
   throw new Error('unable to get latest version');
 }
 
-export async function getRedis(version: string) {
+export async function getRedis(version: string): Promise<string> {
   const selected = determineVersion(version);
 
   // check cache
@@ -42,7 +42,7 @@ export async function getRedis(version: string) {
   if (!toolPath) {
     // download, extract, cache
     toolPath = await acquireRedis(selected);
-    core.debug('Perl tool is cached under ' + toolPath);
+    core.debug('redis tool is cached under ' + toolPath);
   }
 
   toolPath = path.join(toolPath, 'bin');
@@ -50,6 +50,7 @@ export async function getRedis(version: string) {
   // prepend the tools path. instructs the agent to prepend for future tasks
   //
   core.addPath(toolPath);
+  return toolPath;
 }
 
 async function acquireRedis(version: string): Promise<string> {
