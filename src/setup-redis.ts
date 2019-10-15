@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import * as installer from './installer';
-import * as starter from '../src/starter';
+import * as starter from './starter';
 
 async function run() {
   try {
