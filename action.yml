@@ -8,7 +8,7 @@ inputs:
   redis-port:
     description: the port of redis-sever
     default: "6379"
-  auto-restart:
+  auto-start:
     description: enable to auto-start redis-sever
     default: "yes"
 runs:
