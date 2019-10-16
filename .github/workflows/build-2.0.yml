@@ -1,0 +1,40 @@
+name: build-2.0
+
+on:
+  push:
+    branches:
+    - '*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+        - ubuntu-18.04
+        - macOS-10.14
+        redis:
+        - '2.0.4'
+        - '2.0.3'
+        - '2.0.2'
+        - '2.0.1'
+        - '2.0.0'
+    steps:
+    - uses: actions/checkout@v1
+    - name: build
+      shell: bash
+      run: ./build-redis.sh "$REDIS_VERSION"
+      env:
+        REDIS_VERSION: ${{ matrix.redis }}
+    - name: upload
+      shell: bash
+      run: |
+        ACTIONS_VERSION=v$(cat "$GITHUB_WORKSPACE/package.json" | jq -r .version)
+        OS=$(uname | tr '[A-Z]' '[a-z]')
+        curl -sSL https://github.com/shogo82148/s3cli-mini/releases/download/v0.0.2/s3cli-mini_${OS}_amd64.tar.gz -o s3cli-mini.tar.gz
+        tar xzvf s3cli-mini.tar.gz
+        s3cli-mini_${OS}_amd64/s3cli-mini --region us-east-1 cp --acl public-read "$RUNNER_TEMP/redis-bin.tar.gz" "s3://shogo82148-actions-setup-redis/$ACTIONS_VERSION/redis-$REDIS_VERSION-${OS}-x64.tar.gz"
+      env:
+        REDIS_VERSION: ${{ matrix.redis }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
