@@ -28,8 +28,8 @@ describe('installer tests', () => {
   }, 100000);
 
   it('Acquires version of redis if no matching version is installed', async () => {
-    await installer.getRedis('5.x');
-    const redisDir = path.join(toolDir, 'redis', '5.0.5', os.arch());
+    await installer.getRedis('2.x');
+    const redisDir = path.join(toolDir, 'redis', '2.8.24', os.arch());
 
     expect(fs.existsSync(`${redisDir}.complete`)).toBe(true);
     expect(fs.existsSync(path.join(redisDir, 'bin', 'redis-server'))).toBe(
