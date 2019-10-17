@@ -1,4 +1,4 @@
-name: build
+name: build-5.0
 
 on:
   push:
@@ -14,7 +14,13 @@ jobs:
         - ubuntu-18.04
         - macOS-10.14
         redis:
-        - "5.0.5"
+        - '5.0.6'
+        - '5.0.5'
+        - '5.0.4'
+        - '5.0.3'
+        - '5.0.2'
+        - '5.0.1'
+        - '5.0.0'
     steps:
     - uses: actions/checkout@v1
     - name: build
