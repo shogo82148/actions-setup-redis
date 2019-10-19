@@ -3,7 +3,7 @@ name: build-4.0
 on:
   push:
     branches:
-    - '*'
+    - 'releases/*'
 
 jobs:
   build:

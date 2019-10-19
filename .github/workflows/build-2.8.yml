@@ -3,7 +3,7 @@ name: build-2.8
 on:
   push:
     branches:
-    - '*'
+    - 'releases/*'
 
 jobs:
   build:
