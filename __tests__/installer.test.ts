@@ -42,7 +42,7 @@ describe('installer tests', () => {
     const redisPath = await installer.getRedis('5.x');
     const cli = path.join(redisPath, 'redis-cli');
     await starter.startRedis(tempDir, redisPath, 6379);
-    await cleanup.shutdownRedis('6379');
+    await cleanup.shutdownRedis(cli, '6379');
 
     // this command will fail, because the redis-server will be shutdown by cleanup.shutdownRedis();
     const exitCode = await exec.exec(

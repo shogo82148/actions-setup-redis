@@ -3,7 +3,10 @@ import * as cleanup from './cleanup';
 
 async function run() {
   try {
-    cleanup.shutdownRedis(core.getState('REDIS_PORT'));
+    cleanup.shutdownRedis(
+      core.getState('REDIS_CLI'),
+      core.getState('REDIS_PORT')
+    );
   } catch (error) {
     core.setFailed(error.message);
   }
