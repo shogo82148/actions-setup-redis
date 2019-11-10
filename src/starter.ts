@@ -38,15 +38,13 @@ logfile ${log}
   core.debug('wait for redis-server to become ready');
   const cli = path.join(redisPath, 'redis-cli');
   for (let i = 0; i < 10; i++) {
-    const exitCode = await exec.exec(cli, [
-      '-h',
-      '127.0.0.1',
-      '-p',
-      `${port}`,
-      'ping'
-    ], {
-      "ignoreReturnCode": true
-    });
+    const exitCode = await exec.exec(
+      cli,
+      ['-h', '127.0.0.1', '-p', `${port}`, 'ping'],
+      {
+        ignoreReturnCode: true
+      }
+    );
     core.debug(`ping exits with ${exitCode}`);
     if (exitCode === 0) {
       return;

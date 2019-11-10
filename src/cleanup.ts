@@ -6,11 +6,5 @@ export async function shutdownRedis(port: string) {
     return; // no need to shutdown redis-server
   }
   core.debug('shutdown redis-server');
-  await exec.exec('redis-cli', [
-    '-h',
-    '127.0.0.1',
-    '-p',
-    port,
-    'shutdown'
-  ]);
+  await exec.exec('redis-cli', ['-h', '127.0.0.1', '-p', port, 'shutdown']);
 }

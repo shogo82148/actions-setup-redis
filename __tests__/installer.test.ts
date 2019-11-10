@@ -45,15 +45,13 @@ describe('installer tests', () => {
     await cleanup.shutdownRedis('6379');
 
     // this command will fail, because the redis-server will be shutdown by cleanup.shutdownRedis();
-    const exitCode = await exec.exec(cli, [
-      '-h',
-      '127.0.0.1',
-      '-p',
-      '6379',
-      'shutdown'
-    ], {
-      "ignoreReturnCode": true
-    });
+    const exitCode = await exec.exec(
+      cli,
+      ['-h', '127.0.0.1', '-p', '6379', 'shutdown'],
+      {
+        ignoreReturnCode: true
+      }
+    );
     expect(exitCode).toBeGreaterThan(0);
   }, 100000);
 });
