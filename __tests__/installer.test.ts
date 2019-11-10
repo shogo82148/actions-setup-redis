@@ -11,6 +11,7 @@ process.env['RUNNER_TOOL_CACHE'] = toolDir;
 process.env['RUNNER_TEMP'] = tempDir;
 import * as installer from '../src/installer';
 import * as starter from '../src/starter';
+import * as cleanup from '../src/cleanup';
 
 describe('installer tests', () => {
   beforeAll(async () => {
@@ -37,17 +38,22 @@ describe('installer tests', () => {
     );
   }, 100000);
 
-  it('start redis-server', async () => {
+  it('start and shutdown redis-server', async () => {
     const redisPath = await installer.getRedis('5.x');
     const cli = path.join(redisPath, 'redis-cli');
     await starter.startRedis(tempDir, redisPath, 6379);
+    await cleanup.shutdownRedis('6379');
+
+    // this command will fail, because the redis-server will be shutdown by cleanup.shutdownRedis();
     const exitCode = await exec.exec(cli, [
       '-h',
       '127.0.0.1',
       '-p',
       '6379',
       'shutdown'
-    ]);
-    expect(exitCode).toBe(0);
+    ], {
+      "ignoreReturnCode": true
+    });
+    expect(exitCode).toBeGreaterThan(0);
   }, 100000);
 });
