@@ -120,6 +120,7 @@ export async function getRedis(version: string): Promise<string> {
   // prepend the tools path. instructs the agent to prepend for future tasks
   //
   core.addPath(toolPath);
+  core.saveState('REDIS_CLI', path.join(toolPath, 'redis-cli'));
   return toolPath;
 }
 

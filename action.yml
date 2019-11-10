@@ -14,3 +14,5 @@ inputs:
 runs:
   using: 'node12'
   main: 'lib/setup-redis.js'
+  post: 'lib/cleanup-redis.js'
+  post-if: 'always()'
