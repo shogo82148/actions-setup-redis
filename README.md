@@ -1,7 +1,7 @@
 # actions-setup-redis
 
 <p align="left">
-  <a href="https://github.com/shogo82148/actions-setup-redis"><img alt="GitHub Actions status" src="https://github.com/shogo82148/actions-setup-redis/workflows/Main%20workflow/badge.svg"></a>
+  <a href="https://github.com/shogo82148/actions-setup-redis"><img alt="GitHub Actions status" src="https://github.com/shogo82148/actions-setup-redis/workflows/Test/badge.svg"></a>
 </p>
 
 This action sets by [redis](https://redis.io/) database for use in actions by:
