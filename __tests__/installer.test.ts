@@ -39,7 +39,7 @@ describe('installer tests', () => {
   }, 100000);
 
   it('start and shutdown redis-server', async () => {
-    const redisPath = await installer.getRedis('5.x');
+    const redisPath = await installer.getRedis('4.x');
     const cli = path.join(redisPath, 'redis-cli');
     await starter.startRedis(tempDir, redisPath, 6379);
     await cleanup.shutdownRedis(cli, '6379');
