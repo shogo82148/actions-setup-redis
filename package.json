@@ -26,10 +26,12 @@
     "@actions/exec": "^1.0.2",
     "@actions/io": "^1.0.1",
     "@actions/tool-cache": "^1.1.2",
+    "js-yaml": "^3.13.1",
     "semver": "^6.3.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
+    "@types/js-yaml": "^3.12.1",
     "@types/node": "^12.12.17",
     "@types/semver": "^6.2.0",
     "jest": "^24.9.0",
