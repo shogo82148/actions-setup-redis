@@ -45,7 +45,13 @@ interface Matrix {
 async function getAvailableVersions(minorVersion: string): Promise<string[]> {
   return new Promise<Workflow>((resolve, reject) => {
     fs.readFile(
-      path.join(__dirname, '..', '.github', 'workflows', `build-${minorVersion}.yml`),
+      path.join(
+        __dirname,
+        '..',
+        '.github',
+        'workflows',
+        `build-${minorVersion}.yml`
+      ),
       (err, data) => {
         if (err) {
           reject(err);
@@ -59,13 +65,7 @@ async function getAvailableVersions(minorVersion: string): Promise<string[]> {
   });
 }
 
-const minorVersions = [
-  '5.0',
-  '4.0',
-  '3.2',
-  '3.0',
-  '2.8'
-];
+const minorVersions = ['5.0', '4.0', '3.2', '3.0', '2.8'];
 
 async function determineVersion(version: string): Promise<string> {
   for (let minorVersion of minorVersions) {
@@ -74,7 +74,7 @@ async function determineVersion(version: string): Promise<string> {
       if (semver.satisfies(v, version)) {
         return v;
       }
-    }  
+    }
   }
   throw new Error('unable to get latest version');
 }
