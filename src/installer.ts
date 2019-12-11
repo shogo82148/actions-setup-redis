@@ -7,6 +7,7 @@ import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
+import * as yaml from 'js-yaml';
 
 const osPlat = os.platform();
 const osArch = os.arch();
@@ -21,89 +22,65 @@ if (!tempDirectory) {
   tempDirectory = path.join(baseLocation, 'actions', 'temp');
 }
 
-const availableVersions = [
-  '5.0.6',
-  '5.0.5',
-  '5.0.4',
-  '5.0.3',
-  '5.0.2',
-  '5.0.1',
-  '5.0.0',
-  '4.0.14',
-  '4.0.13',
-  '4.0.12',
-  '4.0.11',
-  '4.0.10',
-  '4.0.9',
-  '4.0.8',
-  '4.0.7',
-  '4.0.6',
-  '4.0.5',
-  '4.0.4',
-  '4.0.3',
-  '4.0.2',
-  '4.0.1',
-  '4.0.0',
-  '3.2.13',
-  '3.2.12',
-  '3.2.11',
-  '3.2.10',
-  '3.2.9',
-  '3.2.8',
-  '3.2.7',
-  '3.2.6',
-  '3.2.5',
-  '3.2.4',
-  '3.2.3',
-  '3.2.2',
-  '3.2.1',
-  '3.2.0',
-  '3.0.7',
-  '3.0.6',
-  '3.0.5',
-  '3.0.4',
-  '3.0.3',
-  '3.0.2',
-  '3.0.1',
-  '3.0.0',
-  '2.8.24',
-  '2.8.23',
-  '2.8.22',
-  '2.8.21',
-  '2.8.20',
-  '2.8.19',
-  '2.8.18',
-  '2.8.17',
-  '2.8.16',
-  '2.8.15',
-  '2.8.14',
-  '2.8.13',
-  '2.8.12',
-  '2.8.11',
-  '2.8.10',
-  '2.8.9',
-  '2.8.8',
-  '2.8.7',
-  '2.8.6',
-  '2.8.5',
-  '2.8.4',
-  '2.8.3',
-  '2.8.2',
-  '2.8.1',
-  '2.8.0'
-];
+interface Workflow {
+  jobs: Jobs;
+}
 
-function determineVersion(version: string): string {
-  for (let v of availableVersions) {
-    if (semver.satisfies(v, version)) {
-      return v;
+interface Jobs {
+  build: Job;
+}
+
+interface Job {
+  strategy: Strategy;
+}
+
+interface Strategy {
+  matrix: Matrix;
+}
+
+interface Matrix {
+  redis: string[];
+}
+
+async function getAvailableVersions(minorVersion: string): Promise<string[]> {
+  return new Promise<Workflow>((resolve, reject) => {
+    fs.readFile(
+      path.join(
+        __dirname,
+        '..',
+        '.github',
+        'workflows',
+        `build-${minorVersion}.yml`
+      ),
+      (err, data) => {
+        if (err) {
+          reject(err);
+        }
+        const info: Workflow = yaml.safeLoad(data.toString());
+        resolve(info);
+      }
+    );
+  }).then((info: Workflow) => {
+    return info.jobs.build.strategy.matrix.redis;
+  });
+}
+
+const minorVersions = ['5.0', '4.0', '3.2', '3.0', '2.8'];
+
+async function determineVersion(version: string): Promise<string> {
+  for (let minorVersion of minorVersions) {
+    const availableVersions = await getAvailableVersions(minorVersion);
+    for (let v of availableVersions) {
+      if (semver.satisfies(v, version)) {
+        return v;
+      }
     }
   }
   throw new Error('unable to get latest version');
 }
 
 export async function getRedis(version: string): Promise<string> {
-  const selected = determineVersion(version);
+  const selected = await determineVersion(version);
 
   // check cache
   let toolPath: string;
