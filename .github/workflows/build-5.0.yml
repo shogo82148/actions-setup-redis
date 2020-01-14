@@ -23,7 +23,7 @@ jobs:
         - '5.0.1'
         - '5.0.0'
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: build
       shell: bash
       run: ./build-redis.sh "$REDIS_VERSION"

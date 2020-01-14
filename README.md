@@ -44,7 +44,7 @@ jobs:
         - '4.0'
     name: Redis ${{ matrix.redis }} on ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Setup redis
         uses: shogo82148/actions-setup-redis@v1
         with:
