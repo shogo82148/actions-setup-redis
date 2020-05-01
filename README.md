@@ -24,7 +24,7 @@ steps:
 - uses: actions/checkout@master
 - uses: shogo82148/actions-setup-redis@v1
   with:
-    redis-version: '5.x'
+    redis-version: '6.x'
 - run: redis-cli ping
 ```
 
@@ -40,6 +40,7 @@ jobs:
         - 'macOS-latest'
         # - 'windows-latest' # windows is currently not supported.
         redis:
+        - '6.0'
         - '5.0'
         - '4.0'
     name: Redis ${{ matrix.redis }} on ${{ matrix.os }}
