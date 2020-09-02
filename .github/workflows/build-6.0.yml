@@ -3,7 +3,7 @@ name: build-6.0
 on:
   push:
     branches:
-      - 'releases/*'
+      - "releases/*"
 
 jobs:
   build:
@@ -14,13 +14,14 @@ jobs:
           - ubuntu-18.04
           - macos-latest
         redis:
-          - '6.0.6'
-          - '6.0.5'
-          - '6.0.4'
-          - '6.0.3'
-          - '6.0.2'
-          - '6.0.1'
-          - '6.0.0'
+          - "6.0.7"
+          - "6.0.6"
+          - "6.0.5"
+          - "6.0.4"
+          - "6.0.3"
+          - "6.0.2"
+          - "6.0.1"
+          - "6.0.0"
     steps:
       - uses: actions/checkout@v2
       - name: build
