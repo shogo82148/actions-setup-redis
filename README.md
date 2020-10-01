@@ -21,7 +21,7 @@ See [action.yml](action.yml)
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@master
+- uses: actions/checkout@v2
 - uses: shogo82148/actions-setup-redis@v1
   with:
     redis-version: '6.x'
