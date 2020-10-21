@@ -32,7 +32,7 @@
   "devDependencies": {
     "@types/jest": "^26.0.15",
     "@types/js-yaml": "^3.12.5",
-    "@types/node": "^14.11.11",
+    "@types/node": "^14.14.0",
     "@types/semver": "^7.3.4",
     "jest": "^26.6.0",
     "jest-circus": "^26.6.0",
