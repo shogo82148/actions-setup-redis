@@ -4,16 +4,19 @@ on:
   push:
     branches:
       - "releases/*"
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os:
           - ubuntu-18.04
-          - macos-latest
+          - macos-10.15
         redis:
+          - "6.0.9"
           - "6.0.8"
           - "6.0.7"
           - "6.0.6"
@@ -37,7 +40,7 @@ jobs:
           OS=$(uname | tr '[A-Z]' '[a-z]')
           curl -sSL https://github.com/shogo82148/s3cli-mini/releases/download/v0.0.6/s3cli-mini_${OS}_amd64.tar.gz -o s3cli-mini.tar.gz
           tar xzvf s3cli-mini.tar.gz
-          s3cli-mini_${OS}_amd64/s3cli-mini --region us-east-1 cp --acl public-read "$RUNNER_TEMP/redis-bin.tar.gz" "s3://shogo82148-actions-setup-redis/$ACTIONS_VERSION/redis-$REDIS_VERSION-${OS}-x64.tar.gz"
+          s3cli-mini_${OS}_amd64/s3cli-mini --region us-east-1 cp --acl public-read "$RUNNER_TEMP/redis-bin.tar.xz" "s3://shogo82148-actions-setup-redis/$ACTIONS_VERSION/redis-$REDIS_VERSION-${OS}-x64.tar.xz"
         env:
           REDIS_VERSION: ${{ matrix.redis }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
