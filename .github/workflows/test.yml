@@ -4,6 +4,7 @@ on:
   push:
     branches-ignore:
       - "releases/*"
+  workflow_dispatch:
 
 jobs:
   test:
