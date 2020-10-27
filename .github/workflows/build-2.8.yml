@@ -12,7 +12,7 @@ jobs:
       matrix:
         os:
           - ubuntu-18.04
-          - macos-latest
+          - macos-10.15
         redis:
           - "2.8.24"
           - "2.8.23"
