@@ -119,13 +119,13 @@ async function acquireRedis(version: string): Promise<string> {
   //
   // Extract
   //
-  const extPath = await tc.extractTar(downloadPath);
+  const extPath = await tc.extractTar(downloadPath, "", "xJ");
 
   return await tc.cacheDir(extPath, 'redis', version);
 }
 
 function getFileName(version: string): string {
-  return `redis-${version}-${osPlat}-${osArch}.tar.gz`;
+  return `redis-${version}-${osPlat}-${osArch}.tar.xz`;
 }
 
 interface PackageVersion {
