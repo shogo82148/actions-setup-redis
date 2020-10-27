@@ -4,11 +4,13 @@ on:
   push:
     branches-ignore:
       - "releases/*"
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os:
           - ubuntu-20.04

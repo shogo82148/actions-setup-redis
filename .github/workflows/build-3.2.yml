@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "releases/*"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -40,9 +41,9 @@ jobs:
         run: |
           ACTIONS_VERSION=v$(cat "$GITHUB_WORKSPACE/package.json" | jq -r .version)
           OS=$(uname | tr '[A-Z]' '[a-z]')
-          curl -sSL https://github.com/shogo82148/s3cli-mini/releases/download/v0.0.6/s3cli-mini_${OS}_amd64.tar.gz -o s3cli-mini.tar.gz
-          tar xzvf s3cli-mini.tar.gz
-          s3cli-mini_${OS}_amd64/s3cli-mini --region us-east-1 cp --acl public-read "$RUNNER_TEMP/redis-bin.tar.gz" "s3://shogo82148-actions-setup-redis/$ACTIONS_VERSION/redis-$REDIS_VERSION-${OS}-x64.tar.gz"
+          curl -sSL https://github.com/shogo82148/s3cli-mini/releases/download/v0.0.6/s3cli-mini_${OS}_amd64.tar.xz -o s3cli-mini.tar.xz
+          tar xzvf s3cli-mini.tar.xz
+          s3cli-mini_${OS}_amd64/s3cli-mini --region us-east-1 cp --acl public-read "$RUNNER_TEMP/redis-bin.tar.xz" "s3://shogo82148-actions-setup-redis/$ACTIONS_VERSION/redis-$REDIS_VERSION-${OS}-x64.tar.xz"
         env:
           REDIS_VERSION: ${{ matrix.redis }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
