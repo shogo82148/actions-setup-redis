@@ -55,6 +55,10 @@ async function getAvailableVersions(minorVersion: string): Promise<string[]> {
 const minorVersions = ['6.0', '5.0', '4.0', '3.2', '3.0', '2.8'];
 
 async function determineVersion(version: string): Promise<string> {
+  if (version === 'latest') {
+    const availableVersions = await getAvailableVersions(minorVersions[0]);
+    return availableVersions[0];
+  }
   for (let minorVersion of minorVersions) {
     const availableVersions = await getAvailableVersions(minorVersion);
     for (let v of availableVersions) {

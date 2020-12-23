@@ -4,7 +4,7 @@ author: 'Ichinose Shogo'
 inputs:
   redis-version:
     description: the version of redis
-    default: "5"
+    default: "latest"
     required: true
   redis-port:
     description: the port of redis-sever
