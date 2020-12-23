@@ -28,14 +28,14 @@ logfile ${log}
 `;
   fs.writeFileSync(conf, confContents);
 
-  core.debug('starting redis-server');
+  core.info('starting redis-server');
   const server = path.join(redisPath, 'redis-server');
   const exitCode = await exec.exec(server, [conf]);
   if (exitCode !== 0) {
     throw 'fail to launch redis-server';
   }
 
-  core.debug('wait for redis-server to become ready');
+  core.info('wait for redis-server to become ready');
   const cli = path.join(redisPath, 'redis-cli');
   for (let i = 0; i < 10; i++) {
     const exitCode = await exec.exec(
