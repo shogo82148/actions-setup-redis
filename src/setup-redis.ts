@@ -4,12 +4,19 @@ import * as starter from './starter';
 
 async function run() {
   try {
-    const version = core.getInput('redis-version');
-    const port = parseInt(core.getInput('redis-port'));
-    const autoStart = parseBoolean(core.getInput('auto-start'));
-    if (!version) {
-      return;
-    }
+    const version = core.getInput('redis-version', {
+      required: true
+    });
+    const port = parseInt(
+      core.getInput('redis-port', {
+        required: true
+      })
+    );
+    const autoStart = parseBoolean(
+      core.getInput('auto-start', {
+        required: true
+      })
+    );
 
     const redisPath = await core.group('install redis', async () => {
       return installer.getRedis(version);

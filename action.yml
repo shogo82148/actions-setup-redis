@@ -5,12 +5,15 @@ inputs:
   redis-version:
     description: the version of redis
     default: "5"
+    required: true
   redis-port:
     description: the port of redis-sever
     default: "6379"
+    required: true
   auto-start:
     description: enable to auto-start redis-sever
     default: "yes"
+    required: true
 runs:
   using: 'node12'
   main: 'lib/setup-redis.js'
