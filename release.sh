@@ -16,6 +16,13 @@
 
 set -uex
 
+CURRENT=$(cd "$(dirname "$0")" && pwd)
+VERSION=$1
+MAJOR=$(echo "$VERSION" | cut -d. -f1)
+MINOR=$(echo "$VERSION" | cut -d. -f2)
+PATCH=$(echo "$VERSION" | cut -d. -f3)
+WORKING=$CURRENT/.working
+
 : clone
 ORIGIN=$(git remote get-url origin)
 rm -rf "$WORKING"
