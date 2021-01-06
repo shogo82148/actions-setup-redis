@@ -43,7 +43,7 @@ async function getAvailableVersions(minorVersion: string): Promise<string[]> {
         if (err) {
           reject(err);
         }
-        const info = yaml.safeLoad(data.toString()) as Workflow;
+        const info = yaml.load(data.toString()) as Workflow;
         resolve(info);
       }
     );
