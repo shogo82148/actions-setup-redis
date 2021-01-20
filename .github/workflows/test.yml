@@ -33,6 +33,8 @@ jobs:
       - run: npm run build
       - name: use the action
         uses: ./
+        with:
+          redis-version: "5.0"
       - run: redis-cli ping
 
   lint:
