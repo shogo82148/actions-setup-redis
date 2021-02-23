@@ -1,4 +1,4 @@
-name: build-6.0
+name: build-6.2
 
 on:
   push:
