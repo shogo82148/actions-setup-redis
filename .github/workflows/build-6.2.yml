@@ -16,6 +16,7 @@ jobs:
           - ubuntu-18.04
           - macos-10.15
         redis:
+          - "6.2.1"
           - "6.2.0"
     steps:
       - uses: actions/checkout@v2
