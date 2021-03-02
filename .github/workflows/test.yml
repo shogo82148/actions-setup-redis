@@ -34,7 +34,7 @@ jobs:
       - name: use the action
         uses: ./
         with:
-          redis-version: "5.0"
+          redis-version: "6.2"
       - run: redis-cli ping
 
   lint:
