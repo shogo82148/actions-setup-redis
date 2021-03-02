@@ -40,6 +40,7 @@ jobs:
         - 'macOS-latest'
         # - 'windows-latest' # windows is currently not supported.
         redis:
+        - '6.2'
         - '6.0'
         - '5.0'
         - '4.0'
