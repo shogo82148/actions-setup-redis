@@ -135,6 +135,6 @@ async function getDownloadUrl(filename: string): Promise<string> {
     });
   }).then(info => {
     const actionsVersion = info.version;
-    return `https://shogo82148-actions-setup-redis.s3.amazonaws.com/v${actionsVersion}/${filename}`;
+    return `https://setupredis.blob.core.windows.net/actions-setup-redis/v${actionsVersion}/${filename}`;
   });
 }
