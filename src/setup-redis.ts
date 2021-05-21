@@ -4,19 +4,12 @@ import * as starter from './starter';
 
 async function run() {
   try {
-    const version = core.getInput('redis-version', {
-      required: true
-    });
+    const required = { required: true};
+    const version = core.getInput('redis-version', required);
     const port = parseInt(
-      core.getInput('redis-port', {
-        required: true
-      })
+      core.getInput('redis-port', required)
     );
-    const autoStart = parseBoolean(
-      core.getInput('auto-start', {
-        required: true
-      })
-    );
+    const autoStart = core.getBooleanInput('auto-start', required);
 
     const redisPath = await core.group('install redis', async () => {
       return installer.getRedis(version);
@@ -32,27 +25,4 @@ async function run() {
   }
 }
 
-function parseBoolean(s: string): boolean {
-  switch (s) {
-    case 'y':
-    case 'Y':
-    case 'yes':
-    case 'Yes':
-    case 'YES':
-    case 'true':
-    case 'True':
-    case 'TRUE':
-      return true;
-    case 'n':
-    case 'N':
-    case 'no':
-    case 'No':
-    case 'NO':
-    case 'false':
-    case 'False':
-    case 'FALSE':
-      return false;
-  }
-  throw `invalid boolean value: ${s}`;
-}
 run();
