@@ -117,6 +117,14 @@ async function acquireRedis(version: string): Promise<string> {
 }
 
 function getFileName(version: string): string {
+  switch (osPlat) {
+    case 'linux':
+      break;
+    case 'darwin':
+      break;
+    default:
+      throw new Error(`unsupported platform: ${osPlat}`);
+  }
   return `redis-${version}-${osPlat}-${osArch}.tar.xz`;
 }
 
