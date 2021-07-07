@@ -38,9 +38,9 @@ jobs:
           redis-version: "6.2"
 
       - name: connect via tcp port
-        run: redis-cli -h 127.0.0.1 -p "${{ steps.setup.redis-port }}" ping
+        run: redis-cli -h 127.0.0.1 -p "${{ steps.setup.outputs.redis-port }}" ping
       - name: connect via unix domain socket
-        run: redis-cli -s "${{ steps.setup.redis-unix-socket }}" ping
+        run: redis-cli -s "${{ steps.setup.outputs.redis-unix-socket }}" ping
 
   lint:
     runs-on: ubuntu-latest
