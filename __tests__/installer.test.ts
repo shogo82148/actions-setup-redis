@@ -22,7 +22,7 @@ describe('installer tests', () => {
   afterAll(async () => {
     try {
       await io.rmRF(toolDir);
-      await io.rmRF(tempDir);
+      // await io.rmRF(tempDir);
     } catch {
       console.log('Failed to remove test directories');
     }
