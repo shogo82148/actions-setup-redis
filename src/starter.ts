@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as io from '@actions/io';
 import * as path from 'path';
-import * as fs from 'fs';
+import {promises as fs} from 'fs';
 
 export async function startRedis(
   confPath: string,
@@ -29,7 +29,7 @@ unixsocket ${sock}
 unixsocketperm 700
 logfile ${log}
 `;
-  fs.writeFileSync(conf, confContents);
+  await fs.writeFile(conf, confContents);
 
   core.info('starting redis-server');
   const server = path.join(redisPath, 'redis-server');
@@ -53,6 +53,11 @@ logfile ${log}
     core.debug('wait a little');
     await sleep(1);
   }
+
+  // launch failed, show the log
+  const logContents = await fs.readFile(log);
+  core.info('redis-server log:');
+  core.info(logContents.toString());
   throw new Error('fail to launch redis-server');
 }
 
