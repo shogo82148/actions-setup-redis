@@ -17,13 +17,16 @@ export async function startRedis(
   const pid = path.join(baseDir, 'redis.pid');
   const log = path.join(baseDir, 'redis.log');
   const conf = path.join(baseDir, 'redis.conf');
+  const sock = path.join(baseDir, 'redis.sock');
 
   // generate the configure file
   const confContents = `
 daemonize yes
 pidfile ${pid}
 port ${port}
-bind 127.0.0.1
+bind 127.0.0.1 -::1
+unixsocket ${sock}
+unixsocketperm 700
 logfile ${log}
 `;
   fs.writeFileSync(conf, confContents);
