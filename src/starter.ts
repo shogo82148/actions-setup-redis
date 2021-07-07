@@ -17,7 +17,7 @@ export async function startRedis(
   const conf = path.join(baseDir, 'redis.conf');
   const sock = path.join(baseDir, 'redis.sock');
 
-  core.saveState('REDIS_UNIX_SOCKET', port.toString());
+  core.saveState('REDIS_UNIX_SOCKET', sock);
   core.setOutput('redis-unix-socket', sock);
   core.setOutput('redis-port', port.toString());
 
@@ -35,21 +35,24 @@ logfile ${log}
 
   core.info('starting redis-server');
   const server = path.join(redisPath, 'redis-server');
-  const exitCode = await exec.exec(server, [conf]);
-  if (exitCode !== 0) {
-    throw 'fail to launch redis-server';
-  }
+  await exec.exec(server, [conf]);
 
   core.info('wait for redis-server to become ready');
   const cli = path.join(redisPath, 'redis-cli');
-  for (let i = 0; i < 10; i++) {
-    const exitCode = await exec.exec(cli, ['-s', sock], {
-      ignoreReturnCode: true
-    });
+  const option = {
+    ignoreReturnCode: true
+  };
+  for (let i = 0; ; i++) {
+    const exitCode = await exec.exec(cli, ['-s', sock, 'ping'], option);
     core.debug(`ping exits with ${exitCode}`);
     if (exitCode === 0) {
       return;
     }
+    if (i >= 10) {
+      core.debug('give up');
+      break;
+    }
+    core.debug('wait a little');
     await sleep(1);
   }
   throw new Error('fail to launch redis-server');
@@ -57,6 +60,6 @@ logfile ${log}
 
 function sleep(waitSec: number): Promise<void> {
   return new Promise<void>(function (resolve) {
-    setTimeout(() => resolve(), waitSec);
+    setTimeout(() => resolve(), waitSec * 1000);
   });
 }
