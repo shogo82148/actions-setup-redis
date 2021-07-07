@@ -1,3 +1,5 @@
+import {promises as fs} from 'fs';
+import * as path from 'path';
 import * as core from '@actions/core';
 import * as installer from './installer';
 import * as starter from './starter';
@@ -14,7 +16,8 @@ async function run() {
     });
     if (autoStart) {
       core.group('start redis', async () => {
-        const confDir = process.env['RUNNER_TEMP'] || '/tmp';
+        const tempDir = process.env['RUNNER_TEMP'] || '/tmp';
+        const confDir = await fs.mkdtemp(tempDir + path.sep);
         await starter.startRedis(confDir, redisPath, port);
       });
     }
