@@ -25,16 +25,22 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
+          cache: npm
 
       - run: npm ci
       - run: npm test
 
       - run: npm run build
-      - name: use the action
+      - id: setup
+        name: use the action
         uses: ./
         with:
           redis-version: "6.2"
-      - run: redis-cli ping
+
+      - name: connect via tcp port
+        run: redis-cli -h 127.0.0.1 -p "${{ steps.setup.redis-port }}" ping
+      - name: connect via unix domain socket
+        run: redis-cli -s "${{ steps.setup.redis-unix-socket }}" ping
 
   lint:
     runs-on: ubuntu-latest
@@ -46,6 +52,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
+          cache: npm
 
       - run: npm ci
       - run: npm run format-check
