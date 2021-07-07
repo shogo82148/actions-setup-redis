@@ -9,13 +9,11 @@ export async function startRedis(
   redisPath: string,
   port: number
 ) {
-  const baseDir = path.join(confPath, 'redis');
-  await io.mkdirP(baseDir);
-
-  const pid = path.join(baseDir, 'redis.pid');
-  const log = path.join(baseDir, 'redis.log');
-  const conf = path.join(baseDir, 'redis.conf');
-  const sock = path.join(baseDir, 'redis.sock');
+  await io.mkdirP(confPath);
+  const pid = path.join(confPath, 'redis.pid');
+  const log = path.join(confPath, 'redis.log');
+  const conf = path.join(confPath, 'redis.conf');
+  const sock = path.join(confPath, 'redis.sock');
 
   core.saveState('REDIS_UNIX_SOCKET', sock);
   core.setOutput('redis-unix-socket', sock);
