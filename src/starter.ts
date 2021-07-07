@@ -20,6 +20,7 @@ export async function startRedis(
   const sock = path.join(confPath, 's');
 
   core.saveState('REDIS_UNIX_SOCKET', sock);
+  core.saveState('REDIS_CONF_DIR', confPath);
   core.setOutput('redis-unix-socket', sock);
   core.setOutput('redis-port', port.toString());
 
