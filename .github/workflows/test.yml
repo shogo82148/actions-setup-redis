@@ -28,7 +28,13 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm test
+      - id: test
+        run: npm test
+        continue-on-error: true
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: steps.test.outcome == 'failure'
 
       - run: npm run build
       - id: setup
