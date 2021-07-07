@@ -17,7 +17,7 @@ async function run() {
     if (autoStart) {
       core.group('start redis', async () => {
         const tempDir = process.env['RUNNER_TEMP'] || '/tmp';
-        const confDir = await fs.mkdtemp(path.join(tempDir, 'redis-'));
+        const confDir = await fs.mkdtemp(tempDir + path.sep);
         await starter.startRedis(confDir, redisPath, port);
       });
     }

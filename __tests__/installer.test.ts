@@ -4,8 +4,8 @@ import {promises as fs} from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 
-const toolDir = path.join(__dirname, 'runner', 'tools');
-const tempDir = path.join(__dirname, 'runner', 'temp');
+const toolDir = path.join(__dirname, 'r', 'tools');
+const tempDir = path.join(__dirname, 'r', 'tmp');
 
 process.env['RUNNER_TOOL_CACHE'] = toolDir;
 process.env['RUNNER_TEMP'] = tempDir;
@@ -37,11 +37,11 @@ describe('installer tests', () => {
   }, 100000);
 
   it('start and shutdown redis-server', async () => {
-    const confDir = await fs.mkdtemp(path.join(tempDir, 'redis-'));
+    const confDir = await fs.mkdtemp(tempDir + path.sep);
     const redisPath = await installer.getRedis('4.x');
     const cli = path.join(redisPath, 'redis-cli');
     await starter.startRedis(confDir, redisPath, 6379);
-    await cleanup.shutdownRedis(cli, path.join(confDir, 'redis.sock'));
+    await cleanup.shutdownRedis(cli, path.join(confDir, 's'));
 
     // this command will fail, because the redis-server will be shutdown by cleanup.shutdownRedis();
     const option = {

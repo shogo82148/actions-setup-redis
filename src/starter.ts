@@ -13,7 +13,11 @@ export async function startRedis(
   const pid = path.join(confPath, 'redis.pid');
   const log = path.join(confPath, 'redis.log');
   const conf = path.join(confPath, 'redis.conf');
-  const sock = path.join(confPath, 'redis.sock');
+
+  // XXX: In some systems, the length of unix domain socket path may limit 92 bytes.
+  // so the shorter the file name, the better.
+  // https://man7.org/linux/man-pages/man7/unix.7.html
+  const sock = path.join(confPath, 's');
 
   core.saveState('REDIS_UNIX_SOCKET', sock);
   core.setOutput('redis-unix-socket', sock);
