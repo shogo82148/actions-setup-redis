@@ -7,7 +7,8 @@ import {promises as fs} from 'fs';
 export async function startRedis(
   confPath: string,
   redisPath: string,
-  port: number
+  port: number,
+  configure: string
 ) {
   await io.mkdirP(confPath);
   const pid = path.join(confPath, 'redis.pid');
@@ -33,6 +34,7 @@ bind 127.0.0.1
 unixsocket ${sock}
 unixsocketperm 700
 logfile ${log}
+${configure}
 `;
   await fs.writeFile(conf, confContents);
 
