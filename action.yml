@@ -14,6 +14,9 @@ inputs:
     description: enable to auto-start redis-sever
     default: "true"
     required: true
+  redis-conf:
+    description: extra configurations for redis.conf
+    required: false
 outputs:
   redis-port:
     description: the port of redis-sever

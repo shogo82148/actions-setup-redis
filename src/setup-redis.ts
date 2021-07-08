@@ -10,6 +10,7 @@ async function run() {
     const version = core.getInput('redis-version', required);
     const port = parseInt(core.getInput('redis-port', required));
     const autoStart = core.getBooleanInput('auto-start', required);
+    const conf = core.getInput('redis-conf');
 
     const redisPath = await core.group('install redis', async () => {
       return installer.getRedis(version);
@@ -18,7 +19,7 @@ async function run() {
       core.group('start redis', async () => {
         const tempDir = process.env['RUNNER_TEMP'] || '/tmp';
         const confDir = await fs.mkdtemp(tempDir + path.sep);
-        await starter.startRedis(confDir, redisPath, port);
+        await starter.startRedis(confDir, redisPath, port, conf);
       });
     }
   } catch (error) {

@@ -40,7 +40,7 @@ describe('installer tests', () => {
     const confDir = await fs.mkdtemp(tempDir + path.sep);
     const redisPath = await installer.getRedis('4.x');
     const cli = path.join(redisPath, 'redis-cli');
-    await starter.startRedis(confDir, redisPath, 6379);
+    await starter.startRedis(confDir, redisPath, 6379, '');
     await cleanup.shutdownRedis(cli, path.join(confDir, 's'));
 
     // this command will fail, because the redis-server will be shutdown by cleanup.shutdownRedis();

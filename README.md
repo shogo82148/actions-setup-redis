@@ -86,6 +86,11 @@ If it is `false`, the action just install Redis commands, doesn't start `redis-s
 It is a boolean value, valid values are `true` or `false`.
 The default value is `true`.
 
+### redis-conf
+
+Extra configurations for `redis.conf`.
+See [Redis configuration](https://redis.io/topics/config).
+
 ## Outputs
 
 ### redis-port
