@@ -1,6 +1,6 @@
-name: 'actions-setup-redis'
-description: 'setup redis database'
-author: 'Ichinose Shogo'
+name: "actions-setup-redis"
+description: "setup redis database"
+author: "Ichinose Shogo"
 inputs:
   redis-version:
     description: the version of redis
@@ -14,11 +14,19 @@ inputs:
     description: enable to auto-start redis-sever
     default: "true"
     required: true
+  redis-conf:
+    description: extra configurations for redis.conf
+    required: false
+outputs:
+  redis-port:
+    description: the port of redis-sever
+  redis-unix-socket:
+    description: the unix domain socket that redis-server listens
 runs:
-  using: 'node12'
-  main: 'lib/setup-redis.js'
-  post: 'lib/cleanup-redis.js'
-  post-if: 'always()'
+  using: "node12"
+  main: "lib/setup-redis.js"
+  post: "lib/cleanup-redis.js"
+  post-if: "always()"
 branding:
-  icon: 'database'  
-  color: 'red'
+  icon: "database"
+  color: "red"
