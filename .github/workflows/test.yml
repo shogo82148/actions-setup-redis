@@ -34,7 +34,7 @@ jobs:
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        if: steps.test.outcome == 'failure'
+        if: ${{ steps.test.outcome == 'failure' }}
 
       - run: npm run build
       - id: setup
