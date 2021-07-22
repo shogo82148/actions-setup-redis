@@ -16,6 +16,7 @@ jobs:
           - ubuntu-18.04
           - macos-10.15
         redis:
+          - "6.2.5"
           - "6.2.4"
           - "6.2.3"
           - "6.2.2"
@@ -34,8 +35,8 @@ jobs:
           version: "v10"
       - name: upload
         run: |
-          ACTIONS_VERSION=v$(cat "$GITHUB_WORKSPACE/package.json" | jq -r .version)
-          OS=$(uname | tr '[A-Z]' '[a-z]')
+          ACTIONS_VERSION=v$(jq -r .version < "$GITHUB_WORKSPACE/package.json")
+          OS=$(uname | tr '[:upper:]' '[:lower:]')
           azcopy_v10 login --service-principal --application-id "$AZCOPY_SPA_APPLICATION_ID" --tenant-id "$AZCOPY_TENANT_ID"
           azcopy_v10 cp "$RUNNER_TEMP/redis-bin.tar.xz" "https://setupredis.blob.core.windows.net/actions-setup-redis/$ACTIONS_VERSION/redis-$REDIS_VERSION-${OS}-x64.tar.xz"
         env:
