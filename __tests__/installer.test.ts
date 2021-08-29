@@ -59,7 +59,7 @@ describe('installer tests', () => {
 async function exists(path: string): Promise<boolean> {
   try {
     await fs.stat(path);
-  } catch (error) {
+  } catch {
     return false;
   }
   return true;

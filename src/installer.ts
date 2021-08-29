@@ -103,7 +103,11 @@ async function acquireRedis(version: string): Promise<string> {
     core.info('downloading the binary from ' + downloadUrl);
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
-    core.debug(error);
+    if (error instanceof Error) {
+      core.debug(`error: name: ${error.name}, message: ${error.message}`);
+    } else {
+      core.debug(`${error}`);
+    }
 
     throw `Failed to download version ${version}: ${error}`;
   }
