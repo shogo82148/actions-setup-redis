@@ -13,7 +13,11 @@ async function run() {
       await io.rmRF(confDir);
     }
   } catch (error) {
-    core.setFailed(error.message);
+    if (error instanceof Error) {
+      core.setFailed(error);
+    } else {
+      core.setFailed(`${error}`);
+    }
   }
 }
 
