@@ -37,11 +37,17 @@ describe('installer tests', () => {
   }, 100000);
 
   it('start and shutdown redis-server', async () => {
-    const confDir = await fs.mkdtemp(tempDir + path.sep);
+    const confPath = await fs.mkdtemp(tempDir + path.sep);
     const redisPath = await installer.getRedis('4.x');
     const cli = path.join(redisPath, 'redis-cli');
-    await starter.startRedis(confDir, redisPath, 6379, '');
-    await cleanup.shutdownRedis(cli, path.join(confDir, 's'));
+    await starter.startRedis({
+      confPath,
+      redisPath,
+      port: 6379,
+      tlsPort: 0,
+      configure: ''
+    });
+    await cleanup.shutdownRedis(cli, path.join(confPath, 's'));
 
     // this command will fail, because the redis-server will be shutdown by cleanup.shutdownRedis();
     const option = {
@@ -59,7 +65,7 @@ describe('installer tests', () => {
 async function exists(path: string): Promise<boolean> {
   try {
     await fs.stat(path);
-  } catch (error) {
+  } catch {
     return false;
   }
   return true;

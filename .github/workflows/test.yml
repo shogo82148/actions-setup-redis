@@ -14,7 +14,7 @@ jobs:
         os:
           - ubuntu-20.04
           - ubuntu-18.04
-          - macos-11.0
+          - macos-11
           - macos-10.15
 
     steps:
@@ -30,11 +30,6 @@ jobs:
       - run: npm ci
       - id: test
         run: npm test
-        continue-on-error: true
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ steps.test.outcome == 'failure' }}
 
       - run: npm run build
       - id: setup
@@ -47,6 +42,46 @@ jobs:
         run: redis-cli -h 127.0.0.1 -p "${{ steps.setup.outputs.redis-port }}" ping
       - name: connect via unix domain socket
         run: redis-cli -s "${{ steps.setup.outputs.redis-unix-socket }}" ping
+
+  test-tls:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+          - ubuntu-18.04
+          - macos-11
+          - macos-10.15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set Node.js 12.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+      - id: setup
+        name: use the action
+        uses: ./
+        with:
+          redis-version: "6.2"
+          redis-port: "0"
+          redis-tls-port: "6379"
+
+      - name: connect via tls
+        run: |
+          redis-cli -h 127.0.0.1 -p "${{ steps.setup.outputs.redis-tls-port }}" \
+            --tls \
+            --cert "${{ steps.setup.outputs.redis-tls-dir }}/redis.crt" \
+            --key "${{ steps.setup.outputs.redis-tls-dir }}/redis.key" \
+            --cacert "${{ steps.setup.outputs.redis-tls-dir }}/ca.crt" \
+            ping
 
   lint:
     runs-on: ubuntu-latest

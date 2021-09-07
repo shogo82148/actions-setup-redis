@@ -22,7 +22,7 @@
   "author": "Ichinose Shogo",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.4.0",
+    "@actions/core": "^1.5.0",
     "@actions/exec": "^1.1.0",
     "@actions/io": "^1.1.1",
     "@actions/tool-cache": "^1.7.1",
@@ -30,14 +30,14 @@
     "semver": "^7.3.5"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.24",
-    "@types/js-yaml": "^4.0.2",
-    "@types/node": "^16.4.0",
-    "@types/semver": "^7.3.7",
-    "jest": "^27.0.6",
-    "jest-circus": "^27.0.6",
+    "@types/jest": "^27.0.1",
+    "@types/js-yaml": "^4.0.3",
+    "@types/node": "^16.7.10",
+    "@types/semver": "^7.3.8",
+    "jest": "^27.1.0",
+    "jest-circus": "^27.1.0",
     "prettier": "^2.3.2",
-    "ts-jest": "^27.0.3",
-    "typescript": "^4.3.5"
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.4.2"
   }
 }

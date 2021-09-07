@@ -10,6 +10,10 @@ inputs:
     description: the port of redis-sever
     default: "6379"
     required: true
+  redis-tls-port:
+    description: the tls port of redis-sever
+    default: "0"
+    required: false
   auto-start:
     description: enable to auto-start redis-sever
     default: "true"
@@ -20,6 +24,10 @@ inputs:
 outputs:
   redis-port:
     description: the port of redis-sever
+  redis-tls-port:
+    description: the tls port of redis-sever
+  redis-tls-dir:
+    description: the directory path for tls sample certificates/keys
   redis-unix-socket:
     description: the unix domain socket that redis-server listens
 runs:
