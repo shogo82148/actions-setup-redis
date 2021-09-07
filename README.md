@@ -79,6 +79,11 @@ The actions supports only stable versions.
 The port number that `redis-server` listens.
 The default value is `6379`.
 
+### redis-tls-port
+
+The port number that `redis-server` listens TLS connections.
+The default value is `0` and TLS is disabled.
+
 ### auto-start
 
 If the `auto-start` is `true`, the action starts `redis-server` as a daemon.
@@ -128,6 +133,42 @@ jobs:
       - run: |
           redis-cli -s ${{ steps.setup.outputs.redis-unix-socket }} ping
 ```
+
+### redis-tls-port
+
+The port number that `redis-server` listens TLS connections.
+
+### redis-tls-port
+
+The directory path for TLS sample certificates/keys.
+
+```yaml
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+      - id: setup
+        uses: shogo82148/actions-setup-redis@v1
+        with:
+          # TLS Support starts from v6.0.
+          redis-version: "6.0"
+
+          # TLS is disabled by default. You need extra configurations.
+          redis-port: "0"
+          redis-tls-port: "6379"
+
+      # connect to the redis-server via TLS
+      - run: |
+          redis-cli -h 127.0.0.1 -p "${{ steps.setup.outputs.redis-tls-port }}" \
+            --tls \
+            --cert "${{ steps.setup.outputs.redis-tls-dir }}/redis.crt" \
+            --key "${{ steps.setup.outputs.redis-tls-dir }}/redis.key" \
+            --cacert "${{ steps.setup.outputs.redis-tls-dir }}/ca.crt" \
+            ping
+```
+
+See [TLS Support](https://redis.io/topics/encryption) for more details.
 
 # License
 
