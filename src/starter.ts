@@ -165,7 +165,7 @@ async function generateTestCerts(
     '-subj',
     '/O=Redis Test/CN=Certificate Authority',
     '-out',
-    cakey
+    cacrt
   ]);
   const opensslCnf = path.join(tlsPath, 'openssl.cnf');
   await fs.writeFile(
