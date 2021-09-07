@@ -4,12 +4,25 @@ import * as io from '@actions/io';
 import * as path from 'path';
 import {promises as fs} from 'fs';
 
-export async function startRedis(
-  confPath: string,
-  redisPath: string,
-  port: number,
-  configure: string
-) {
+export interface Options {
+  // the base directory path for config files.
+  confPath: string;
+
+  // the directory redis installed.
+  redisPath: string;
+
+  // the port number for TCP.
+  port: number;
+
+  // the port number for TLS.
+  tlsPort: number;
+
+  // the extra configuration of redis.conf.
+  configure: string;
+}
+
+export async function startRedis(opts: Options) {
+  const {confPath, redisPath, port, tlsPort, configure} = opts;
   await io.mkdirP(confPath);
   const pid = path.join(confPath, 'redis.pid');
   const log = path.join(confPath, 'redis.log');
@@ -24,6 +37,9 @@ export async function startRedis(
   core.saveState('REDIS_CONF_DIR', confPath);
   core.setOutput('redis-unix-socket', sock);
   core.setOutput('redis-port', port.toString());
+  core.setOutput('redis-tls-port', tlsPort.toString());
+
+  const tlsConfigure = await generateTestCerts(confPath, tlsPort, redisPath);
 
   // generate the configure file
   const confContents = `
@@ -34,6 +50,7 @@ bind 127.0.0.1
 unixsocket ${sock}
 unixsocketperm 700
 logfile ${log}
+${tlsConfigure}
 ${configure}
 `;
   await fs.writeFile(conf, confContents);
@@ -66,6 +83,127 @@ ${configure}
   core.info('redis-server log:');
   core.info(logContents.toString());
   throw new Error('fail to launch redis-server');
+}
+
+// generate certificates and keys, and returns the configure for redis.conf.
+// port of https://github.com/redis/redis/blob/763fd0941683eb64190daca6abab1f29a72a772e/utils/gen-test-certs.sh
+async function generateTestCerts(
+  confPath: string,
+  tlsPort: number,
+  redisPath: string
+): Promise<string> {
+  // search bundled openssl
+  const openssl = path.join(redisPath, 'openssl');
+  try {
+    await fs.stat(openssl);
+  } catch {
+    // bundled openssl is not found, this version of redis might not support TLS.
+    // skip TLS configuration.
+    core.setOutput('redis-tls-dir', '');
+    return '';
+  }
+
+  process.env['LD_LIBRARY_PATH'] = path.join(redisPath, '..', 'lib');
+  process.env['DYLD_LIBRARY_PATH'] = path.join(redisPath, '..', 'lib');
+
+  const tlsPath = path.join(confPath, 'tls');
+  await io.mkdirP(tlsPath);
+  const cacrt = path.join(tlsPath, 'ca.crt');
+  const cakey = path.join(tlsPath, 'ca.key');
+  const catxt = path.join(tlsPath, 'ca.txt');
+  core.setOutput('redis-tls-dir', tlsPath);
+
+  const generateCert = async (name: string, cn: string, opts: string[]) => {
+    const keyfile = path.join(tlsPath, `${name}.key`);
+    const certfile = path.join(tlsPath, `${name}.crt`);
+    await exec.exec(openssl, ['genrsa', '-out', keyfile, '2048']);
+    const output = await exec.getExecOutput(openssl, [
+      'req',
+      '-new',
+      '-sha256',
+      '-subj',
+      `/O=Redis Test/CN=${cn}`,
+      '-key',
+      keyfile
+    ]);
+    await exec.exec(
+      openssl,
+      [
+        'x509',
+        '-req',
+        '-sha256',
+        '-CA',
+        cacrt,
+        '-CAkey',
+        cakey,
+        '-CAserial',
+        catxt,
+        '-CAcreateserial',
+        '-days',
+        '365',
+        ...opts,
+        '-out',
+        certfile
+      ],
+      {
+        input: Buffer.from(output.stdout, 'utf-8')
+      }
+    );
+  };
+
+  await exec.exec(openssl, ['genrsa', '-out', cakey, '4096']);
+  await exec.exec(openssl, [
+    'req',
+    '-x509',
+    '-new',
+    '-nodes',
+    '-sha256',
+    '-key',
+    cakey,
+    '-days',
+    '3650',
+    '-subj',
+    '/O=Redis Test/CN=Certificate Authority',
+    '-out',
+    cacrt
+  ]);
+  const opensslCnf = path.join(tlsPath, 'openssl.cnf');
+  await fs.writeFile(
+    opensslCnf,
+    `[ server_cert ]
+keyUsage = digitalSignature, keyEncipherment
+nsCertType = server
+[ client_cert ]
+keyUsage = digitalSignature, keyEncipherment
+nsCertType = client
+`
+  );
+  await generateCert('server', 'Server-only', [
+    '-extfile',
+    opensslCnf,
+    '-extensions',
+    'server_cert'
+  ]);
+  await generateCert('client', 'Client-only', [
+    '-extfile',
+    opensslCnf,
+    '-extensions',
+    'client_cert'
+  ]);
+  await generateCert('redis', 'Generic-cert', []);
+  await exec.exec('openssl', [
+    'dhparam',
+    '-out',
+    path.join(tlsPath, 'redis.dh'),
+    '2048'
+  ]);
+
+  return `tls-port ${tlsPort}
+tls-cert-file ${path.join(tlsPath, 'redis.crt')}
+tls-key-file ${path.join(tlsPath, 'redis.key')}
+tls-ca-cert-file ${path.join(tlsPath, 'ca.crt')}
+tls-dh-params-file ${path.join(tlsPath, 'redis.dh')}
+`;
 }
 
 function sleep(waitSec: number): Promise<void> {
