@@ -103,6 +103,9 @@ async function generateTestCerts(
     return '';
   }
 
+  process.env['LD_LIBRARY_PATH'] = path.join(redisPath, '..', 'lib');
+  process.env['DYLD_LIBRARY_PATH'] = path.join(redisPath, '..', 'lib');
+
   const tlsPath = path.join(confPath, 'tls');
   await io.mkdirP(tlsPath);
   const cacrt = path.join(tlsPath, 'ca.crt');
