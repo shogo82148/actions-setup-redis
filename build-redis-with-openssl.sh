@@ -3,7 +3,7 @@
 set -uex
 
 ROOT=$(cd "$(dirname "$0")" && pwd)
-REDIS_VERSION=$1
+export REDIS_VERSION=$1
 : "${RUNNER_TEMP:=$ROOT/.work}"
 : "${RUNNER_TOOL_CACHE:=$RUNNER_TEMP/dist}"
 PREFIX=$RUNNER_TOOL_CACHE/redis/$REDIS_VERSION/x64
@@ -62,9 +62,11 @@ echo "::group::build redis"
     cd "$RUNNER_TEMP"
     tar xzf redis.tar.gz
     cd "redis-$REDIS_VERSION"
-    perl -pi -e "s(OPENSSL_PREFIX=.*$)(OPENSSL_PREFIX=$PREFIX)" src/Makefile
-    perl -pi -e "s(OPENSSL_CFLAGS=.*$)(OPENSSL_CFLAGS=-I$PREFIX/include)" src/Makefile
-    perl -pi -e "s(OPENSSL_LDFLAGS=.*$)(OPENSSL_LDFLAGS=-L$PREFIX/lib)" src/Makefile
+    if perl -E 'exit((version->new($ENV{REDIS_VERSION}) < version->new("v6.2.6")) ? 0 : 1)'; then
+        perl -pi -e "s(OPENSSL_PREFIX=.*$)(OPENSSL_PREFIX=$PREFIX)" src/Makefile
+        perl -pi -e "s(OPENSSL_CFLAGS=.*$)(OPENSSL_CFLAGS=-I$PREFIX/include)" src/Makefile
+        perl -pi -e "s(OPENSSL_LDFLAGS=.*$)(OPENSSL_LDFLAGS=-L$PREFIX/lib)" src/Makefile
+    fi
     make "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX"
 )
 echo "::endgroup::"
