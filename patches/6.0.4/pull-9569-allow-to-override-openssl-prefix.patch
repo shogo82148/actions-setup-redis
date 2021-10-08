@@ -1,17 +1,5 @@
-From 3af03b2fb25293e204c62950b8acfbf2e890b096 Mon Sep 17 00:00:00 2001
-From: Yunier Perez <pyunier@vmware.com>
-Date: Wed, 29 Sep 2021 11:25:39 -0500
-Subject: [PATCH] Allow to override OPENSSL_PREFIX
-
-While the original issue was on Linux, this should work for other
-platforms as well.
----
- deps/hiredis/Makefile |  7 ++++++-
- src/Makefile          | 16 ++++++++++------
- 2 files changed, 16 insertions(+), 7 deletions(-)
-
 diff --git a/deps/hiredis/Makefile b/deps/hiredis/Makefile
-index a8d37a2ebbd3..7e41c97a574c 100644
+index a8d37a2eb..7e41c97a5 100644
 --- a/deps/hiredis/Makefile
 +++ b/deps/hiredis/Makefile
 @@ -77,7 +77,12 @@ ifeq ($(USE_SSL),1)
@@ -29,28 +17,25 @@ index a8d37a2ebbd3..7e41c97a574c 100644
    OPENSSL_PREFIX?=/usr/local/opt/openssl
    CFLAGS+=-I$(OPENSSL_PREFIX)/include
 diff --git a/src/Makefile b/src/Makefile
-index 595231ca41e5..4930bbb7d962 100644
+index cf3e8c031..1001f5b39 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -121,15 +121,11 @@ ifeq ($(uname_S),Darwin)
+@@ -121,12 +121,10 @@ ifeq ($(uname_S),Darwin)
  	# must be referenced explicitly during build.
  ifeq ($(uname_M),arm64)
  	# Homebrew arm64 uses /opt/homebrew as HOMEBREW_PREFIX
--	OPENSSL_PREFIX=/opt/homebrew/opt/openssl
+-	OPENSSL_CFLAGS=-I/opt/homebrew/opt/openssl/include
+-	OPENSSL_LDFLAGS=-L/opt/homebrew/opt/openssl/lib
 +	OPENSSL_PREFIX?=/opt/homebrew/opt/openssl
  else
  	# Homebrew x86/ppc uses /usr/local as HOMEBREW_PREFIX
--	OPENSSL_PREFIX=/usr/local/opt/openssl
+-	OPENSSL_CFLAGS=-I/usr/local/opt/openssl/include
+-	OPENSSL_LDFLAGS=-L/usr/local/opt/openssl/lib
 +	OPENSSL_PREFIX?=/usr/local/opt/openssl
  endif
--OPENSSL_CFLAGS=-I$(OPENSSL_PREFIX)/include
--OPENSSL_LDFLAGS=-L$(OPENSSL_PREFIX)/lib
--# Also export OPENSSL_PREFIX so it ends up in deps sub-Makefiles
--export OPENSSL_PREFIX
  else
  ifeq ($(uname_S),AIX)
-         # AIX
-@@ -190,6 +186,14 @@ endif
+@@ -188,6 +186,14 @@ endif
  endif
  endif
  endif
