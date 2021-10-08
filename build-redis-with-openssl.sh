@@ -62,12 +62,7 @@ echo "::group::build redis"
     cd "$RUNNER_TEMP"
     tar xzf redis.tar.gz
     cd "redis-$REDIS_VERSION"
-    if perl -E 'exit((version->new($ENV{REDIS_VERSION}) < version->new("v6.2.6")) ? 0 : 1)'; then
-        perl -pi -e "s(OPENSSL_PREFIX=.*$)(OPENSSL_PREFIX=$PREFIX)" src/Makefile
-        perl -pi -e "s(OPENSSL_CFLAGS=.*$)(OPENSSL_CFLAGS=-I$PREFIX/include)" src/Makefile
-        perl -pi -e "s(OPENSSL_LDFLAGS=.*$)(OPENSSL_LDFLAGS=-L$PREFIX/lib)" src/Makefile
-    fi
-    make "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX"
+    make "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 )
 echo "::endgroup::"
 
