@@ -62,6 +62,13 @@ echo "::group::build redis"
     cd "$RUNNER_TEMP"
     tar xzf redis.tar.gz
     cd "redis-$REDIS_VERSION"
+
+    # apply patches
+    if [[ -d "$ROOT/patches/$REDIS_VERSION" ]]
+    then
+        cat "$ROOT/patches/$REDIS_VERSION"/*.patch | patch -s -f -p1
+    fi
+
     make "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 )
 echo "::endgroup::"
