@@ -70,7 +70,7 @@ echo "::group::archive redis binary"
 (
     cd "$RUNNER_TEMP/redis-$REDIS_VERSION"
     mkdir -p "$PREFIX"
-    make install PREFIX="$PREFIX"
+    make install "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 
     # remove dev packages
     rm -rf "$PREFIX/include"
