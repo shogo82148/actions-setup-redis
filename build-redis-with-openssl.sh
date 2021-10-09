@@ -3,7 +3,7 @@
 set -uex
 
 ROOT=$(cd "$(dirname "$0")" && pwd)
-REDIS_VERSION=$1
+export REDIS_VERSION=$1
 : "${RUNNER_TEMP:=$ROOT/.work}"
 : "${RUNNER_TOOL_CACHE:=$RUNNER_TEMP/dist}"
 PREFIX=$RUNNER_TOOL_CACHE/redis/$REDIS_VERSION/x64
@@ -62,10 +62,14 @@ echo "::group::build redis"
     cd "$RUNNER_TEMP"
     tar xzf redis.tar.gz
     cd "redis-$REDIS_VERSION"
-    perl -pi -e "s(OPENSSL_PREFIX=.*$)(OPENSSL_PREFIX=$PREFIX)" src/Makefile
-    perl -pi -e "s(OPENSSL_CFLAGS=.*$)(OPENSSL_CFLAGS=-I$PREFIX/include)" src/Makefile
-    perl -pi -e "s(OPENSSL_LDFLAGS=.*$)(OPENSSL_LDFLAGS=-L$PREFIX/lib)" src/Makefile
-    make "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX"
+
+    # apply patches
+    if [[ -d "$ROOT/patches/$REDIS_VERSION" ]]
+    then
+        cat "$ROOT/patches/$REDIS_VERSION"/*.patch | patch -s -f -p1
+    fi
+
+    make "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 )
 echo "::endgroup::"
 
@@ -73,7 +77,7 @@ echo "::group::archive redis binary"
 (
     cd "$RUNNER_TEMP/redis-$REDIS_VERSION"
     mkdir -p "$PREFIX"
-    make install PREFIX="$PREFIX"
+    make install "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 
     # remove dev packages
     rm -rf "$PREFIX/include"
