@@ -13,11 +13,11 @@ async function run() {
     const autoStart = core.getBooleanInput('auto-start', required);
     const configure = core.getInput('redis-conf');
 
-    const redisPath = await core.group('install redis', async () => {
-      return installer.getRedis(version);
+    const redisPath = await core.group('install redis', async (): Promise<string> => {
+      return await installer.getRedis(version);
     });
     if (autoStart) {
-      core.group('start redis', async () => {
+      await core.group('start redis', async () => {
         const tempDir = process.env['RUNNER_TEMP'] || '/tmp';
         const confPath = await fs.mkdtemp(tempDir + path.sep);
         await starter.startRedis({
