@@ -1,8 +1,8 @@
-import * as core from '@actions/core';
 import * as cleanup from './cleanup';
+import * as core from '@actions/core';
 import * as io from '@actions/io';
 
-async function run() {
+async function run() { // TODO: should add return type
   try {
     await cleanup.shutdownRedis(
       core.getState('REDIS_CLI'),
