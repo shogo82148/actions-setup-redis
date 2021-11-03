@@ -1,10 +1,10 @@
-import {promises as fs} from 'fs';
-import * as path from 'path';
 import * as core from '@actions/core';
 import * as installer from './installer';
+import * as path from 'path';
 import * as starter from './starter';
+import {promises as fs} from 'fs';
 
-async function run() {
+async function run(): Promise<void> {
   try {
     const required = {required: true};
     const version = core.getInput('redis-version', required);
