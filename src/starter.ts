@@ -21,7 +21,7 @@ export interface Options {
   configure: string;
 }
 
-export async function startRedis(opts: Options) {
+export async function startRedis(opts: Options): Promise<void> {
   const {confPath, redisPath, port, tlsPort, configure} = opts;
   await io.mkdirP(confPath);
   const pid = path.join(confPath, 'redis.pid');
@@ -113,7 +113,11 @@ async function generateTestCerts(
   const catxt = path.join(tlsPath, 'ca.txt');
   core.setOutput('redis-tls-dir', tlsPath);
 
-  const generateCert = async (name: string, cn: string, opts: string[]) => {
+  const generateCert = async (
+    name: string,
+    cn: string,
+    opts: string[]
+  ): Promise<void> => {
     const keyfile = path.join(tlsPath, `${name}.key`);
     const certfile = path.join(tlsPath, `${name}.crt`);
     await exec.exec(openssl, ['genrsa', '-out', keyfile, '2048']);
@@ -206,7 +210,7 @@ tls-dh-params-file ${path.join(tlsPath, 'redis.dh')}
 `;
 }
 
-function sleep(waitSec: number): Promise<void> {
+async function sleep(waitSec: number): Promise<void> {
   return new Promise<void>(function (resolve) {
     setTimeout(() => resolve(), waitSec * 1000);
   });

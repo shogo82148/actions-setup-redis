@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
-export async function shutdownRedis(cli: string, sock: string) {
+export async function shutdownRedis(cli: string, sock: string): Promise<void> {
   if (cli === '' || sock === '') {
     return; // no need to shutdown redis-server
   }

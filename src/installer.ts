@@ -1,9 +1,9 @@
 import * as core from '@actions/core';
-import * as tc from '@actions/tool-cache';
-import * as os from 'os';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
+import * as tc from '@actions/tool-cache';
 import * as yaml from 'js-yaml';
 
 const osPlat = os.platform();
@@ -30,7 +30,7 @@ interface Matrix {
 }
 
 async function getAvailableVersions(minorVersion: string): Promise<string[]> {
-  return new Promise<Workflow>((resolve, reject) => {
+  const promise = new Promise<Workflow>((resolve, reject) => {
     fs.readFile(
       path.join(
         __dirname,
@@ -47,9 +47,10 @@ async function getAvailableVersions(minorVersion: string): Promise<string[]> {
         resolve(info);
       }
     );
-  }).then((info: Workflow) => {
-    return info.jobs.build.strategy.matrix.redis;
   });
+
+  const info = await promise;
+  return info.jobs.build.strategy.matrix.redis;
 }
 
 const minorVersions = ['6.2', '6.0', '5.0', '4.0', '3.2', '3.0', '2.8'];
@@ -59,9 +60,9 @@ async function determineVersion(version: string): Promise<string> {
     const availableVersions = await getAvailableVersions(minorVersions[0]);
     return availableVersions[0];
   }
-  for (let minorVersion of minorVersions) {
+  for (const minorVersion of minorVersions) {
     const availableVersions = await getAvailableVersions(minorVersion);
-    for (let v of availableVersions) {
+    for (const v of availableVersions) {
       if (semver.satisfies(v, version)) {
         return v;
       }
@@ -80,7 +81,7 @@ export async function getRedis(version: string): Promise<string> {
   if (!toolPath) {
     // download, extract, cache
     toolPath = await acquireRedis(selected);
-    core.info('redis tool is cached under ' + toolPath);
+    core.info(`redis tool is cached under ${toolPath}`);
   }
 
   toolPath = path.join(toolPath, 'bin');
@@ -100,7 +101,7 @@ async function acquireRedis(version: string): Promise<string> {
   const downloadUrl = await getDownloadUrl(fileName);
   let downloadPath: string | null = null;
   try {
-    core.info('downloading the binary from ' + downloadUrl);
+    core.info(`downloading the binary from ${downloadUrl}`);
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
     if (error instanceof Error) {
@@ -109,7 +110,7 @@ async function acquireRedis(version: string): Promise<string> {
       core.debug(`${error}`);
     }
 
-    throw `Failed to download version ${version}: ${error}`;
+    throw new Error(`Failed to download version ${version}: ${error}`);
   }
 
   //
@@ -137,7 +138,7 @@ interface PackageVersion {
 }
 
 async function getDownloadUrl(filename: string): Promise<string> {
-  return new Promise<PackageVersion>((resolve, reject) => {
+  const promise = new Promise<PackageVersion>((resolve, reject) => {
     fs.readFile(path.join(__dirname, '..', 'package.json'), (err, data) => {
       if (err) {
         reject(err);
@@ -145,8 +146,9 @@ async function getDownloadUrl(filename: string): Promise<string> {
       const info: PackageVersion = JSON.parse(data.toString());
       resolve(info);
     });
-  }).then(info => {
-    const actionsVersion = info.version;
-    return `https://setupredis.blob.core.windows.net/actions-setup-redis/v${actionsVersion}/${filename}`;
   });
+
+  const info = await promise;
+  const actionsVersion = info.version;
+  return `https://setupredis.blob.core.windows.net/actions-setup-redis/v${actionsVersion}/${filename}`;
 }
