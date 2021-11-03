@@ -59,9 +59,9 @@ async function determineVersion(version: string): Promise<string> {
     const availableVersions = await getAvailableVersions(minorVersions[0]);
     return availableVersions[0];
   }
-  for (let minorVersion of minorVersions) {
+  for (const minorVersion of minorVersions) {
     const availableVersions = await getAvailableVersions(minorVersion);
-    for (let v of availableVersions) {
+    for (const v of availableVersions) {
       if (semver.satisfies(v, version)) {
         return v;
       }
@@ -80,7 +80,7 @@ export async function getRedis(version: string): Promise<string> {
   if (!toolPath) {
     // download, extract, cache
     toolPath = await acquireRedis(selected);
-    core.info('redis tool is cached under ' + toolPath);
+    core.info(`redis tool is cached under ${toolPath}`);
   }
 
   toolPath = path.join(toolPath, 'bin');
@@ -100,7 +100,7 @@ async function acquireRedis(version: string): Promise<string> {
   const downloadUrl = await getDownloadUrl(fileName);
   let downloadPath: string | null = null;
   try {
-    core.info('downloading the binary from ' + downloadUrl);
+    core.info(`downloading the binary from ${downloadUrl}`);
     downloadPath = await tc.downloadTool(downloadUrl);
   } catch (error) {
     if (error instanceof Error) {

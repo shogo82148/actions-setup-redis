@@ -206,7 +206,7 @@ tls-dh-params-file ${path.join(tlsPath, 'redis.dh')}
 `;
 }
 
-function sleep(waitSec: number): Promise<void> {
+async function sleep(waitSec: number): Promise<void> {
   return new Promise<void>(function (resolve) {
     setTimeout(() => resolve(), waitSec * 1000);
   });
