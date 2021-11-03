@@ -11,6 +11,7 @@ jobs:
         with:
           reporter: github-pr-review
           level: warning
+          eslint_flags: 'src/**/*.ts'
 
   actionlint:
     runs-on: ubuntu-latest
