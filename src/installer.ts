@@ -116,7 +116,7 @@ async function acquireRedis(version: string): Promise<string> {
   //
   // Extract
   //
-  const extPath = await tc.extractTar(downloadPath, '', 'xJ');
+  const extPath = await tc.extractTar(downloadPath, '', ['--use-compress-program', 'zstd -d --long=30']);
 
   return await tc.cacheDir(extPath, 'redis', version);
 }
@@ -130,7 +130,7 @@ function getFileName(version: string): string {
     default:
       throw new Error(`unsupported platform: ${osPlat}`);
   }
-  return `redis-${version}-${osPlat}-${osArch}.tar.xz`;
+  return `redis-${version}-${osPlat}-${osArch}.tar.zstd`;
 }
 
 interface PackageVersion {
