@@ -1,6 +1,6 @@
 {
   "name": "actions-setup-redis",
-  "version": "1.13.2",
+  "version": "1.14.0",
   "private": true,
   "description": "setup redis database action",
   "main": "lib/setup-redis.js",
