@@ -116,7 +116,10 @@ async function acquireRedis(version: string): Promise<string> {
   //
   // Extract
   //
-  const extPath = await tc.extractTar(downloadPath, '', ['--use-compress-program', 'zstd -d --long=30']);
+  const extPath = await tc.extractTar(downloadPath, '', [
+    '--use-compress-program',
+    'zstd -d --long=30'
+  ]);
 
   return await tc.cacheDir(extPath, 'redis', version);
 }
