@@ -53,7 +53,8 @@ jobs:
         run: |
           ACTIONS_VERSION=v$(jq -r .version < "$GITHUB_WORKSPACE/package.json")
           OS=$(uname | tr '[:upper:]' '[:lower:]')
-          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/redis-bin.tar.zstd#redis-$REDIS_VERSION-${OS}-x64.tar.zstd"
+          mv "$RUNNER_TEMP/redis-bin.tar.zstd" "$RUNNER_TEMP/redis-$REDIS_VERSION-$OS-x64.tar.zstd"
+          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/redis-$REDIS_VERSION-$OS-x64.tar.zstd"
         env:
           REDIS_VERSION: ${{ matrix.redis }}
           GITHUB_TOKEN: ${{ github.token }}
