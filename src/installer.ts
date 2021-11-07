@@ -154,5 +154,5 @@ async function getDownloadUrl(filename: string): Promise<string> {
 
   const info = await promise;
   const actionsVersion = info.version;
-  return `https://setupredis.blob.core.windows.net/actions-setup-redis/v${actionsVersion}/${filename}`;
+  return `https://github.com/shogo82148/actions-setup-redis/releases/download/v${actionsVersion}/${filename}`;
 }

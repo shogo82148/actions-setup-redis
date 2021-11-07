@@ -35,8 +35,7 @@ perl -ne 'print unless m(^/node_modules/|/lib/$)' -i .gitignore
 git add .
 git commit -m "bump up to v$MAJOR.$MINOR.$PATCH" || true
 git push origin "releases/v$MAJOR"
-git tag -a "v$MAJOR.$MINOR.$PATCH" -m "release v$MAJOR.$MINOR.$PATCH"
-git push origin "v$MAJOR.$MINOR.$PATCH"
+gh release create "v$MAJOR.$MINOR.$PATCH" --draft --target "$(git rev-parse HEAD)"
 
 cd "$CURRENT"
 rm -rf "$WORKING"
