@@ -36,8 +36,10 @@ git checkout "v$MAJOR.$MINOR.$PATCH" || (
     : see the comments of ./release.sh for more details.
     exit 1
 )
-git tag -fa "v$MAJOR" -m "release v$MAJOR.$MINOR.$PATCH"
+git tag -sfa "v$MAJOR" -m "release v$MAJOR.$MINOR.$PATCH"
 git push -f origin "v$MAJOR"
 
 cd "$CURRENT"
 rm -rf "$WORKING"
+
+open "https://github.com/shogo82148/actions-setup-redis/releases/tag/v$MAJOR.$MINOR.$PATCH"

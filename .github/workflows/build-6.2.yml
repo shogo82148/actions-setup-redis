@@ -31,17 +31,11 @@ jobs:
         env:
           REDIS_VERSION: ${{ matrix.redis }}
 
-      - uses: kheiakiyama/install-azcopy-action@v1
-        with:
-          version: "v10"
       - name: upload
         run: |
           ACTIONS_VERSION=v$(jq -r .version < "$GITHUB_WORKSPACE/package.json")
           OS=$(uname | tr '[:upper:]' '[:lower:]')
-          azcopy_v10 login --service-principal --application-id "$AZCOPY_SPA_APPLICATION_ID" --tenant-id "$AZCOPY_TENANT_ID"
-          azcopy_v10 cp "$RUNNER_TEMP/redis-bin.tar.zstd" "https://setupredis.blob.core.windows.net/actions-setup-redis/$ACTIONS_VERSION/redis-$REDIS_VERSION-${OS}-x64.tar.zstd"
+          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/redis-bin.tar.zstd#redis-$REDIS_VERSION-${OS}-x64.tar.zstd"
         env:
           REDIS_VERSION: ${{ matrix.redis }}
-          AZCOPY_SPA_APPLICATION_ID: ${{ secrets.AZCOPY_SPA_APPLICATION_ID }}
-          AZCOPY_SPA_CLIENT_SECRET: ${{ secrets.AZCOPY_SPA_CLIENT_SECRET }}
-          AZCOPY_TENANT_ID: ${{ secrets.AZCOPY_TENANT_ID }}
+          GITHUB_TOKEN: ${{ github.token }}
