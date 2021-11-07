@@ -84,6 +84,6 @@ echo "::group::archive redis binary"
     rm -rf "$PREFIX/lib/pkgconfig"
 
     cd "$PREFIX"
-    tar Jcvf "$RUNNER_TEMP/redis-bin.tar.xz" .
+    tar --use-compress-program 'zstd -T0 --long=30 --ultra -22' -cf "$RUNNER_TEMP/redis-bin.tar.xz" .
 )
 echo "::endgroup::"

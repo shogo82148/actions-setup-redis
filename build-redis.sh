@@ -19,4 +19,4 @@ mkdir -p "$RUNNER_TEMP/dist"
 make install PREFIX="$RUNNER_TEMP/dist"
 
 cd "$RUNNER_TEMP/dist"
-tar Jcvf "../redis-bin.tar.xz" .
+tar --use-compress-program 'zstd -T0 --long=30 --ultra -22' -cf "../redis-bin.tar.zstd" .
