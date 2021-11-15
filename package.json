@@ -35,7 +35,7 @@
     "@types/js-yaml": "^4.0.4",
     "@types/node": "^16.11.1",
     "@types/semver": "^7.3.9",
-    "@typescript-eslint/parser": "^5.3.1",
+    "@typescript-eslint/parser": "^5.4.0",
     "eslint": "^8.2.0",
     "eslint-plugin-github": "^4.3.4",
     "eslint-plugin-jest": "^25.2.4",
