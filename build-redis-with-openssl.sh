@@ -12,7 +12,7 @@ PREFIX=$RUNNER_TOOL_CACHE/redis/$REDIS_VERSION/x64
 JOBS=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu_max 2>/dev/null)
 
 # bundle OpenSSL for better reproducibility.
-OPENSSL_VERSION=1_1_1l
+OPENSSL_VERSION=1_1_1m
 mkdir -p "$RUNNER_TEMP"
 cd "$RUNNER_TEMP"
 
