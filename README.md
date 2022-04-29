@@ -21,7 +21,7 @@ See [action.yml](action.yml)
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
 - uses: shogo82148/actions-setup-redis@v1
   with:
     redis-version: '6.x'
@@ -46,7 +46,7 @@ jobs:
         - '4.0'
     name: Redis ${{ matrix.redis }} on ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup redis
         uses: shogo82148/actions-setup-redis@v1
         with:
@@ -107,7 +107,7 @@ jobs:
   build:
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - id: setup
         uses: shogo82148/actions-setup-redis@v1
 
@@ -125,7 +125,7 @@ jobs:
   build:
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - id: setup
         uses: shogo82148/actions-setup-redis@v1
 
@@ -147,7 +147,7 @@ jobs:
   build:
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - id: setup
         uses: shogo82148/actions-setup-redis@v1
         with:
