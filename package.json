@@ -26,7 +26,7 @@
     "@actions/core": "^1.8.2",
     "@actions/exec": "^1.1.1",
     "@actions/io": "^1.1.2",
-    "@actions/tool-cache": "^2.0.0",
+    "@actions/tool-cache": "^2.0.1",
     "js-yaml": "^4.1.0",
     "semver": "^7.3.7"
   },
