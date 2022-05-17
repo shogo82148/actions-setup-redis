@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: build
         shell: bash
-        run: ./build-redis-with-openssl.sh "$REDIS_VERSION"
+        run: ./build-redis-with-openssl3.sh "$REDIS_VERSION"
         env:
           REDIS_VERSION: ${{ matrix.redis }}
 
