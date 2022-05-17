@@ -36,7 +36,7 @@ echo "::group::build OpenSSL"
 (
     set -eux
     cd "$RUNNER_TEMP/openssl-openssl-$OPENSSL_VERSION"
-    ./Configure --prefix="$PREFIX" --openssldir="$PREFIX" "-Wl,-rpath,\$(LIBRPATH)"
+    ./Configure --prefix="$PREFIX" --openssldir="$PREFIX" --libdir=lib "-Wl,-rpath,\$(LIBRPATH)"
     make "-j$JOBS"
     make install
 )
