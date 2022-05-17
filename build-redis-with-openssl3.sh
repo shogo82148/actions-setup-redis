@@ -35,14 +35,8 @@ echo "::endgroup::"
 echo "::group::build OpenSSL"
 (
     set -eux
-    TARGET=""
-    OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-    case "$OS" in
-        darwin) TARGET="darwin64-x86_64-cc" ;;
-        linux) TARGET="linux-x86_64" ;;
-    esac
     cd "$RUNNER_TEMP/openssl-openssl-$OPENSSL_VERSION"
-    ./Configure --prefix="$PREFIX" "$TARGET"
+    ./Configure --prefix="$PREFIX" --openssldir="$PREFIX" "-Wl,-rpath,\$(LIBRPATH)"
     make "-j$JOBS"
     make install_sw install_ssldirs
 )
