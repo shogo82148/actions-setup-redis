@@ -38,7 +38,7 @@ echo "::group::build OpenSSL"
     cd "$RUNNER_TEMP/openssl-openssl-$OPENSSL_VERSION"
     ./Configure --prefix="$PREFIX" --openssldir="$PREFIX" "-Wl,-rpath,\$(LIBRPATH)"
     make "-j$JOBS"
-    make install_sw install_ssldirs
+    make install
 )
 echo "::endgroup::"
 
