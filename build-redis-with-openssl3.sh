@@ -8,7 +8,7 @@ export REDIS_VERSION=$1
 : "${RUNNER_TOOL_CACHE:=$RUNNER_TEMP/dist}"
 PREFIX=$RUNNER_TOOL_CACHE/redis/$REDIS_VERSION/x64
 # shellcheck disable=SC2016
-export LDFLAGS=-Wl,-rpath,'$ORIGIN/../lib'
+export LDFLAGS=-Wl,-rpath,'\$$ORIGIN/../lib'
 
 # detect the number of CPU Core
 JOBS=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu_max 2>/dev/null)
@@ -38,7 +38,7 @@ echo "::group::build OpenSSL"
 (
     set -eux
     cd "$RUNNER_TEMP/openssl-openssl-$OPENSSL_VERSION"
-    ./Configure --prefix="$PREFIX" --openssldir="$PREFIX" --libdir=lib "-Wl,-rpath,\$(LIBRPATH)"
+    ./Configure --prefix="$PREFIX" --openssldir="$PREFIX" --libdir=lib
     make "-j$JOBS"
     make install
 )
