@@ -1,0 +1,44 @@
+diff --git a/src/Makefile b/src/Makefile
+index 2a0d74d82..df4041e15 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -116,7 +116,7 @@ endif
+ -include .make-settings
+ 
+ FINAL_CFLAGS=$(STD) $(WARN) $(OPT) $(DEBUG) $(CFLAGS) $(REDIS_CFLAGS)
+-FINAL_LDFLAGS=$(LDFLAGS) $(REDIS_LDFLAGS) $(DEBUG)
++FINAL_LDFLAGS=$(value LDFLAGS) $(REDIS_LDFLAGS) $(DEBUG)
+ FINAL_LIBS=-lm
+ DEBUG=-g -ggdb
+ 
+@@ -339,18 +339,18 @@ endif
+ .PHONY: all
+ 
+ persist-settings: distclean
+-	echo STD=$(STD) >> .make-settings
+-	echo WARN=$(WARN) >> .make-settings
+-	echo OPT=$(OPT) >> .make-settings
+-	echo MALLOC=$(MALLOC) >> .make-settings
+-	echo BUILD_TLS=$(BUILD_TLS) >> .make-settings
+-	echo USE_SYSTEMD=$(USE_SYSTEMD) >> .make-settings
+-	echo CFLAGS=$(CFLAGS) >> .make-settings
+-	echo LDFLAGS=$(LDFLAGS) >> .make-settings
+-	echo REDIS_CFLAGS=$(REDIS_CFLAGS) >> .make-settings
+-	echo REDIS_LDFLAGS=$(REDIS_LDFLAGS) >> .make-settings
+-	echo PREV_FINAL_CFLAGS=$(FINAL_CFLAGS) >> .make-settings
+-	echo PREV_FINAL_LDFLAGS=$(FINAL_LDFLAGS) >> .make-settings
++	echo 'STD=$(value STD)' >> .make-settings
++	echo 'WARN=$(value WARN)' >> .make-settings
++	echo 'OPT=$(value OPT)' >> .make-settings
++	echo 'MALLOC=$(value MALLOC)' >> .make-settings
++	echo 'BUILD_TLS=$(value BUILD_TLS)' >> .make-settings
++	echo 'USE_SYSTEMD=$(value USE_SYSTEMD)' >> .make-settings
++	echo 'CFLAGS=$(value CFLAGS)' >> .make-settings
++	echo 'LDFLAGS=$(value LDFLAGS)' >> .make-settings
++	echo 'REDIS_CFLAGS=$(value REDIS_CFLAGS)' >> .make-settings
++	echo 'REDIS_LDFLAGS=$(value REDIS_LDFLAGS)' >> .make-settings
++	echo 'PREV_FINAL_CFLAGS=$(value FINAL_CFLAGS)' >> .make-settings
++	echo 'PREV_FINAL_LDFLAGS=$(value FINAL_LDFLAGS)' >> .make-settings
+ 	-(cd ../deps && $(MAKE) $(DEPENDENCY_TARGETS))
+ 
+ .PHONY: persist-settings
