@@ -18,6 +18,9 @@ jobs:
           - macos-12
           - macos-11
           - macos-10.15
+        redis:
+          - "6.2"
+          - "7.0"
 
     steps:
       - name: Checkout
@@ -38,7 +41,7 @@ jobs:
         name: use the action
         uses: ./
         with:
-          redis-version: "6.2"
+          redis-version: ${{ matrix.redis }}
 
       - name: connect via tcp port
         run: redis-cli -h 127.0.0.1 -p "${{ steps.setup.outputs.redis-port }}" ping
@@ -57,6 +60,9 @@ jobs:
           - macos-12
           - macos-11
           - macos-10.15
+        redis:
+          - "6.2"
+          - "7.0"
 
     steps:
       - name: Checkout
@@ -74,7 +80,7 @@ jobs:
         name: use the action
         uses: ./
         with:
-          redis-version: "6.2"
+          redis-version: ${{ matrix.redis }}
           redis-port: "0"
           redis-tls-port: "6379"
 
