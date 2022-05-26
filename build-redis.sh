@@ -6,6 +6,9 @@ set -uex
 ROOT=$(cd "$(dirname "$0")" && pwd)
 REDIS_VERSION=$1
 : "${RUNNER_TEMP:=$ROOT/.work}"
+# shellcheck disable=SC2016
+export LDFLAGS=-rpath,'$ORIGIN/../lib'
+
 mkdir -p "$RUNNER_TEMP"
 curl -sSL "https://github.com/redis/redis/archive/$REDIS_VERSION.tar.gz" -o "$RUNNER_TEMP/redis.tar.gz"
 
