@@ -14,7 +14,7 @@ export LDFLAGS=-Wl,-rpath,'\$$ORIGIN/../lib'
 JOBS=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu_max 2>/dev/null)
 
 # bundle OpenSSL for better reproducibility.
-OPENSSL_VERSION=3.0.3
+OPENSSL_VERSION=3.0.4
 mkdir -p "$RUNNER_TEMP"
 cd "$RUNNER_TEMP"
 
