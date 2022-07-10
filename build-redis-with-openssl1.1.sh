@@ -46,7 +46,7 @@ echo "::group::build OpenSSL"
     cd "$RUNNER_TEMP/openssl-OpenSSL_$OPENSSL_VERSION"
 
     # patches for fixing https://github.com/openssl/openssl/issues/18720
-    patch -s -f -p0 <<PATCH
+    patch -s -f -p1 <<PATCH
 From f9e578e720bb35228948564192adbe3bc503d5fb Mon Sep 17 00:00:00 2001
 From: Gregor Jasny <gjasny@googlemail.com>
 Date: Tue, 5 Jul 2022 12:57:06 +0200
