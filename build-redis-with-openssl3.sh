@@ -14,7 +14,7 @@ export LDFLAGS=-Wl,-rpath,'\$$ORIGIN/../lib'
 JOBS=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu_max 2>/dev/null)
 
 # bundle OpenSSL for better reproducibility.
-OPENSSL_VERSION=3.0.5
+OPENSSL_VERSION=3.0.7
 mkdir -p "$RUNNER_TEMP"
 cd "$RUNNER_TEMP"
 
@@ -40,7 +40,7 @@ echo "::group::build OpenSSL"
     cd "$RUNNER_TEMP/openssl-openssl-$OPENSSL_VERSION"
     ./Configure --prefix="$PREFIX" --openssldir="$PREFIX" --libdir=lib
     make "-j$JOBS"
-    make install
+    make install_sw install_ssldirs
 )
 echo "::endgroup::"
 
