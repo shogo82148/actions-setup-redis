@@ -78,7 +78,7 @@ jobs:
       # reproduce https://github.com/shogo82148/actions-setup-redis/issues/693
       - id: tmp
         run: |
-          echo RUNNER_TOOL_CACHE=$(mktemp -d) >> "$GITHUB_ENV"
+          echo TEST_RUNNER_TOOL_CACHE="$(mktemp -d)" >> "$GITHUB_ENV"
 
       - id: setup
         name: use the action
