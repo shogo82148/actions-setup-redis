@@ -74,6 +74,11 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+
+      - id: tmp
+        run: |
+          echo tmp-dir=$(mktemp -d) >> "$GITHUB_OUTPUT"
+
       - id: setup
         name: use the action
         uses: ./
@@ -81,6 +86,9 @@ jobs:
           redis-version: ${{ matrix.redis }}
           redis-port: "0"
           redis-tls-port: "6379"
+        env:
+          # to reproduce https://github.com/shogo82148/actions-setup-redis/issues/693
+          RUNNER_TOOL_CACHE: ${{ steps.tmp.outputs.tmp-dir }}
 
       - name: connect via tls
         run: |
