@@ -94,17 +94,27 @@ async function generateTestCerts(
 ): Promise<string> {
   // search bundled openssl
   const openssl = path.join(redisPath, 'openssl');
-  try {
-    await fs.stat(openssl);
-  } catch {
+  if (!(await exists(openssl))) {
     // bundled openssl is not found, this version of redis might not support TLS.
     // skip TLS configuration.
     core.setOutput('redis-tls-dir', '');
     return '';
   }
 
-  process.env['LD_LIBRARY_PATH'] = path.join(redisPath, '..', 'lib');
-  process.env['DYLD_LIBRARY_PATH'] = path.join(redisPath, '..', 'lib');
+  const lib = path.join(redisPath, '..', 'lib');
+  process.env['LD_LIBRARY_PATH'] = lib;
+  process.env['DYLD_LIBRARY_PATH'] = lib;
+
+  // configure OPENSSL_CONF
+  // https://github.com/shogo82148/actions-setup-redis/issues/693
+  let conf = path.join(redisPath, '..', 'openssl.cnf');
+  if (await exists(conf)) {
+    process.env['OPENSSL_CONF'] = conf;
+  }
+  conf = path.join(redisPath, '..', 'ssl', 'openssl.cnf');
+  if (await exists(conf)) {
+    process.env['OPENSSL_CONF'] = conf;
+  }
 
   const tlsPath = path.join(confPath, 'tls');
   await io.mkdirP(tlsPath);
@@ -214,4 +224,13 @@ async function sleep(waitSec: number): Promise<void> {
   return new Promise<void>(function (resolve) {
     setTimeout(() => resolve(), waitSec * 1000);
   });
+}
+
+async function exists(filename: string): Promise<boolean> {
+  try {
+    await fs.stat(filename);
+  } catch {
+    return false;
+  }
+  return true;
 }
