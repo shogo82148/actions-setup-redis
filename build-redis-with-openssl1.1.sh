@@ -61,7 +61,7 @@ echo "::group::build OpenSSL"
     if [[ $OS = darwin ]]; then
         install_name_tool -id "@rpath/libcrypto.1.1.dylib" "$PREFIX/lib/libcrypto.1.1.dylib"
         install_name_tool -id "@rpath/libssl.1.1.dylib" "$PREFIX/lib/libssl.1.1.dylib"
-        install_name_tool -change libcrypto.1.1.dylib "@rpath/libcrypto.1.1.dylib" "$PREFIX/lib/libssl.1.1.dylib"
+        install_name_tool -change "$PREFIX/lib/libcrypto.1.1.dylib" "@rpath/libcrypto.1.1.dylib" "$PREFIX/lib/libssl.1.1.dylib"
     fi
 )
 echo "::endgroup::"
