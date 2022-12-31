@@ -5,6 +5,9 @@ import * as starter from './starter';
 import {promises as fs} from 'fs';
 
 async function run(): Promise<void> {
+  if (process.env['TEST_RUNNER_TOOL_CACHE']) {
+    process.env['RUNNER_TOOL_CACHE'] = process.env['TEST_RUNNER_TOOL_CACHE'];
+  }
   try {
     const required = {required: true};
     const version = core.getInput('redis-version', required);
