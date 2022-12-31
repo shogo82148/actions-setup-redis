@@ -56,6 +56,8 @@ echo "::group::build OpenSSL"
         install_name_tool -id "@rpath/libcrypto.3.dylib" "$PREFIX/lib/libcrypto.3.dylib"
         install_name_tool -id "@rpath/libssl.3.dylib" "$PREFIX/lib/libssl.3.dylib"
         install_name_tool -change "$PREFIX/lib/libcrypto.3.dylib" "@rpath/libcrypto.3.dylib" "$PREFIX/lib/libssl.3.dylib"
+        install_name_tool -change "$PREFIX/lib/libcrypto.3.dylib" "@rpath/libcrypto.3.dylib" "$PREFIX/bin/openssl"
+        install_name_tool -change "$PREFIX/lib/libssl.3.dylib" "@rpath/libssl.3.dylib" "$PREFIX/bin/openssl"
     fi
 )
 echo "::endgroup::"
