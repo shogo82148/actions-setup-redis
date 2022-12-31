@@ -7,11 +7,21 @@ export REDIS_VERSION=$1
 : "${RUNNER_TEMP:=$ROOT/.work}"
 : "${RUNNER_TOOL_CACHE:=$RUNNER_TEMP/dist}"
 PREFIX=$RUNNER_TOOL_CACHE/redis/$REDIS_VERSION/x64
-# shellcheck disable=SC2016
-export LDFLAGS=-Wl,-rpath,'\$$ORIGIN/../lib'
 
-# detect the number of CPU Core
-JOBS=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu_max 2>/dev/null)
+# configure rpath, and detect the number of CPU Core
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+case "$OS" in
+    darwin)
+        LDFLAGS=-Wl,-rpath,'@executable_path/../lib'
+        JOBS=$(sysctl -n hw.logicalcpu_max 2>/dev/null)
+    ;;
+    linux)
+        # shellcheck disable=SC2016
+        LDFLAGS=-Wl,-rpath,'\$$ORIGIN/../lib'
+        JOBS=$(nproc 2>/dev/null)
+    ;;
+esac
+export LDFLAGS
 
 # bundle OpenSSL for better reproducibility.
 OPENSSL_VERSION=3.0.7
@@ -41,6 +51,11 @@ echo "::group::build OpenSSL"
     ./Configure --prefix="$PREFIX" --openssldir="$PREFIX" --libdir=lib
     make "-j$JOBS"
     make install_sw install_ssldirs
+
+    if [[ $OS = darwin ]]; then
+        install_name_tool -id "@rpath/libcrypto.1.1.dylib" "$PREFIX/lib/libcrypto.1.1.dylib"
+        install_name_tool -id "@rpath/libssl.1.1.dylib" "$PREFIX/lib/libssl.1.1.dylib"
+    fi
 )
 echo "::endgroup::"
 
