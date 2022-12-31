@@ -101,10 +101,6 @@ async function generateTestCerts(
     return '';
   }
 
-  const lib = path.join(redisPath, '..', 'lib');
-  process.env['LD_LIBRARY_PATH'] = lib;
-  process.env['DYLD_LIBRARY_PATH'] = lib;
-
   // configure OPENSSL_CONF
   // https://github.com/shogo82148/actions-setup-redis/issues/693
   let conf = path.join(redisPath, '..', 'openssl.cnf');
