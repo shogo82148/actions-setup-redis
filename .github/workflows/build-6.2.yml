@@ -13,9 +13,10 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-18.04
+          - ubuntu-20.04
           - macos-11
         redis:
+          - "6.2.12"
           - "6.2.11"
           - "6.2.10"
           - "6.2.9"
