@@ -24,7 +24,7 @@ esac
 export LDFLAGS
 
 # bundle OpenSSL for better reproducibility.
-OPENSSL_VERSION=1_1_1t
+OPENSSL_VERSION=1_1_1u
 mkdir -p "$RUNNER_TEMP"
 cd "$RUNNER_TEMP"
 
