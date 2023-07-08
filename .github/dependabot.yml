@@ -1,18 +1,26 @@
+# dependabot config
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
 version: 2
 updates:
-  - package-ecosystem: npm
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    # Look for `package.json` and `lock` files in the `root` directory
     directory: "/"
+    # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 10
     ignore:
-      # update too often, ignore patch releases
       - dependency-name: "@types/node"
-        update-types: ["version-update:semver-patch"]
+        update-types:
+          # We update the major version manually,
+          # because it should be the same as the runtime version.
+          - "version-update:semver-major"
+          # update too often, ignore patch releases
+          - "version-update:semver-patch"
 
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
- 
