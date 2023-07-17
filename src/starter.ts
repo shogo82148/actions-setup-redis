@@ -149,7 +149,7 @@ async function generateTestCerts(confPath: string, tlsPort: number, redisPath: s
       ],
       {
         input: Buffer.from(output.stdout, "utf-8"),
-      }
+      },
     );
   };
 
@@ -178,7 +178,7 @@ nsCertType = server
 [ client_cert ]
 keyUsage = digitalSignature, keyEncipherment
 nsCertType = client
-`
+`,
   );
   await generateCert("server", "Server-only", ["-extfile", opensslCnf, "-extensions", "server_cert"]);
   await generateCert("client", "Client-only", ["-extfile", opensslCnf, "-extensions", "client_cert"]);
