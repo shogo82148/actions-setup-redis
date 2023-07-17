@@ -1,10 +1,10 @@
-import * as core from '@actions/core';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import * as semver from 'semver';
-import * as tc from '@actions/tool-cache';
-import * as yaml from 'js-yaml';
+import * as core from "@actions/core";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import * as semver from "semver";
+import * as tc from "@actions/tool-cache";
+import * as yaml from "js-yaml";
 
 const osPlat = os.platform();
 const osArch = os.arch();
@@ -31,32 +31,23 @@ interface Matrix {
 
 async function getAvailableVersions(minorVersion: string): Promise<string[]> {
   const promise = new Promise<Workflow>((resolve, reject) => {
-    fs.readFile(
-      path.join(
-        __dirname,
-        '..',
-        '.github',
-        'workflows',
-        `build-${minorVersion}.yml`
-      ),
-      (err, data) => {
-        if (err) {
-          reject(err);
-        }
-        const info = yaml.load(data.toString()) as Workflow;
-        resolve(info);
+    fs.readFile(path.join(__dirname, "..", ".github", "workflows", `build-${minorVersion}.yml`), (err, data) => {
+      if (err) {
+        reject(err);
       }
-    );
+      const info = yaml.load(data.toString()) as Workflow;
+      resolve(info);
+    });
   });
 
   const info = await promise;
   return info.jobs.build.strategy.matrix.redis;
 }
 
-const minorVersions = ['7.0', '6.2', '6.0', '5.0', '4.0', '3.2', '3.0', '2.8'];
+const minorVersions = ["7.0", "6.2", "6.0", "5.0", "4.0", "3.2", "3.0", "2.8"];
 
 async function determineVersion(version: string): Promise<string> {
-  if (version === 'latest') {
+  if (version === "latest") {
     const availableVersions = await getAvailableVersions(minorVersions[0]);
     return availableVersions[0];
   }
@@ -68,7 +59,7 @@ async function determineVersion(version: string): Promise<string> {
       }
     }
   }
-  throw new Error('unable to get latest version');
+  throw new Error("unable to get latest version");
 }
 
 export async function getRedis(version: string): Promise<string> {
@@ -76,7 +67,7 @@ export async function getRedis(version: string): Promise<string> {
 
   // check cache
   let toolPath: string;
-  toolPath = tc.find('redis', selected);
+  toolPath = tc.find("redis", selected);
 
   if (!toolPath) {
     // download, extract, cache
@@ -84,12 +75,12 @@ export async function getRedis(version: string): Promise<string> {
     core.info(`redis tool is cached under ${toolPath}`);
   }
 
-  toolPath = path.join(toolPath, 'bin');
+  toolPath = path.join(toolPath, "bin");
   //
   // prepend the tools path. instructs the agent to prepend for future tasks
   //
   core.addPath(toolPath);
-  core.saveState('REDIS_CLI', path.join(toolPath, 'redis-cli'));
+  core.saveState("REDIS_CLI", path.join(toolPath, "redis-cli"));
   return toolPath;
 }
 
@@ -116,20 +107,16 @@ async function acquireRedis(version: string): Promise<string> {
   //
   // Extract
   //
-  const extPath = await tc.extractTar(downloadPath, '', [
-    '--use-compress-program',
-    'zstd -d --long=30',
-    '-x'
-  ]);
+  const extPath = await tc.extractTar(downloadPath, "", ["--use-compress-program", "zstd -d --long=30", "-x"]);
 
-  return await tc.cacheDir(extPath, 'redis', version);
+  return await tc.cacheDir(extPath, "redis", version);
 }
 
 function getFileName(version: string): string {
   switch (osPlat) {
-    case 'linux':
+    case "linux":
       break;
-    case 'darwin':
+    case "darwin":
       break;
     default:
       throw new Error(`unsupported platform: ${osPlat}`);
@@ -143,7 +130,7 @@ interface PackageVersion {
 
 async function getDownloadUrl(filename: string): Promise<string> {
   const promise = new Promise<PackageVersion>((resolve, reject) => {
-    fs.readFile(path.join(__dirname, '..', 'package.json'), (err, data) => {
+    fs.readFile(path.join(__dirname, "..", "package.json"), (err, data) => {
       if (err) {
         reject(err);
       }
