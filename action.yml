@@ -1,6 +1,6 @@
 name: "actions-setup-redis"
 description: "setup redis database"
-author: "Ichinose Shogo"
+author: "ICHINOSE Shogo"
 inputs:
   redis-version:
     description: the version of redis
