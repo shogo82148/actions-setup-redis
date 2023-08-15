@@ -18,8 +18,11 @@ jobs:
           - macos-12
           - macos-11
         redis:
+          # The latest version that supports OpenSSL 1.1.1
           - "6.2"
-          - "7.0"
+
+          # Ths latest version
+          - "7.2"
 
     steps:
       - name: Checkout
