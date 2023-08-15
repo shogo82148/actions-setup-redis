@@ -1,0 +1,36 @@
+name: build-7.2
+
+on:
+  push:
+    branches:
+      - "releases/*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+          - macos-11
+        redis:
+          - "7.2.0"
+    steps:
+      - uses: actions/checkout@v3
+      - name: build
+        shell: bash
+        run: ./build-redis-with-openssl3.sh "$REDIS_VERSION"
+        env:
+          REDIS_VERSION: ${{ matrix.redis }}
+
+      - name: upload
+        run: |
+          ACTIONS_VERSION=v$(jq -r .version < "$GITHUB_WORKSPACE/package.json")
+          OS=$(uname | tr '[:upper:]' '[:lower:]')
+          mv "$RUNNER_TEMP/redis-bin.tar.zstd" "$RUNNER_TEMP/redis-$REDIS_VERSION-$OS-x64.tar.zstd"
+          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/redis-$REDIS_VERSION-$OS-x64.tar.zstd"
+        env:
+          REDIS_VERSION: ${{ matrix.redis }}
+          GITHUB_TOKEN: ${{ github.token }}
