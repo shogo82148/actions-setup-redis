@@ -44,7 +44,7 @@ async function getAvailableVersions(minorVersion: string): Promise<string[]> {
   return info.jobs.build.strategy.matrix.redis;
 }
 
-const minorVersions = ["7.0", "6.2", "6.0", "5.0", "4.0", "3.2", "3.0", "2.8"];
+const minorVersions = ["7.2", "7.0", "6.2", "6.0", "5.0", "4.0", "3.2", "3.0", "2.8"];
 
 async function determineVersion(version: string): Promise<string> {
   if (version === "latest") {
