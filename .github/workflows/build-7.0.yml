@@ -30,7 +30,7 @@ jobs:
           - "7.0.1"
           - "7.0.0"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: build
         shell: bash
         run: ./build-redis-with-openssl3.sh "$REDIS_VERSION"
