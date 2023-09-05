@@ -18,7 +18,7 @@ jobs:
         redis:
           - "7.2.0"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: build
         shell: bash
         run: ./build-redis-with-openssl3.sh "$REDIS_VERSION"
