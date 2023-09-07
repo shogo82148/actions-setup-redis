@@ -16,6 +16,7 @@ jobs:
           - ubuntu-20.04
           - macos-11
         redis:
+          - "7.0.13"
           - "7.0.12"
           - "7.0.11"
           - "7.0.10"
@@ -30,7 +31,7 @@ jobs:
           - "7.0.1"
           - "7.0.0"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: build
         shell: bash
         run: ./build-redis-with-openssl3.sh "$REDIS_VERSION"
