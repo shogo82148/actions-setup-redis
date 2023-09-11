@@ -4,6 +4,9 @@
   "private": true,
   "description": "setup redis database action",
   "main": "lib/setup-redis.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "format": "prettier --write **/*.ts",
@@ -20,7 +23,7 @@
     "redis",
     "setup"
   ],
-  "author": "Ichinose Shogo",
+  "author": "ICHINOSE Shogo",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.10.1",
@@ -33,7 +36,7 @@
   "devDependencies": {
     "@types/jest": "^29.5.4",
     "@types/js-yaml": "^4.0.5",
-    "@types/node": "^16.18.3",
+    "@types/node": "^20.6.0",
     "@types/semver": "^7.5.1",
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^8.49.0",
