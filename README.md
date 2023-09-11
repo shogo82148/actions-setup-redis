@@ -19,16 +19,18 @@ This action sets by [redis](https://redis.io/) database for use in actions by:
 See [action.yml](action.yml)
 
 Basic:
+
 ```yaml
 steps:
-- uses: actions/checkout@v3
-- uses: shogo82148/actions-setup-redis@v1
-  with:
-    redis-version: '6.x'
-- run: redis-cli ping
+  - uses: actions/checkout@v4
+  - uses: shogo82148/actions-setup-redis@v1
+    with:
+      redis-version: "6.x"
+  - run: redis-cli ping
 ```
 
 Matrix Testing:
+
 ```yaml
 jobs:
   build:
@@ -36,17 +38,17 @@ jobs:
     strategy:
       matrix:
         os:
-        - 'ubuntu-latest'
-        - 'macOS-latest'
+          - "ubuntu-latest"
+          - "macOS-latest"
         # - 'windows-latest' # windows is currently not supported.
         redis:
-        - '6.2'
-        - '6.0'
-        - '5.0'
-        - '4.0'
+          - "6.2"
+          - "6.0"
+          - "5.0"
+          - "4.0"
     name: Redis ${{ matrix.redis }} on ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup redis
         uses: shogo82148/actions-setup-redis@v1
         with:
@@ -105,9 +107,9 @@ The port number that `redis-server` listens.
 ```yaml
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: setup
         uses: shogo82148/actions-setup-redis@v1
 
@@ -123,9 +125,9 @@ The unix domain socket path that `redis-server` listens.
 ```yaml
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: setup
         uses: shogo82148/actions-setup-redis@v1
 
@@ -145,9 +147,9 @@ The directory path for TLS sample certificates/keys.
 ```yaml
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: setup
         uses: shogo82148/actions-setup-redis@v1
         with:
