@@ -1,0 +1,86 @@
+commit 2f27ebb41482b9c482d5df3c1982fe4686cd2dbb
+Author: Jachin <ygcaicn@gmail.com>
+Date:   Sun Oct 8 16:12:50 2023 +0800
+
+    Fix compile on macOS 13 (#12611)
+    
+    Use the __MAC_OS_X_VERSION_MIN_REQUIRED macro to detect the
+    macOS system version instead of using MAC_OS_X_VERSION_10_6.
+    
+    From MacOSX14.0.sdk, the default definitions of MAC_OS_X_VERSION_xxx have
+    been removed in usr/include/AvailabilityMacros.h. It includes AvailabilityVersions.h,
+    where the following condition must be met:
+    `#if (!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || defined(_DARWIN_C_SOURCE)`
+    Only then will MAC_OS_X_VERSION_xxx be defined.
+    However, in the project, _DARWIN_C_SOURCE is not defined, which leads to the
+    loss of the definition for MAC_OS_X_VERSION_10_6.
+    
+    (cherry picked from commit a2b0701d2cf64c62f9bb41c01ad44586f01c2c5b)
+
+diff --git a/src/config.h b/src/config.h
+index 2f351a1b4..f98ec2fe1 100644
+--- a/src/config.h
++++ b/src/config.h
+@@ -39,8 +39,12 @@
+ #include <fcntl.h>
+ #endif
+ 
++#if defined(__APPLE__) && defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
++#define MAC_OS_10_6_DETECTED
++#endif
++
+ /* Define redis_fstat to fstat or fstat64() */
+-#if defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_6)
++#if defined(__APPLE__) && !defined(MAC_OS_10_6_DETECTED)
+ #define redis_fstat fstat64
+ #define redis_stat stat64
+ #else
+@@ -79,7 +83,7 @@
+ #define HAVE_EPOLL 1
+ #endif
+ 
+-#if (defined(__APPLE__) && defined(MAC_OS_X_VERSION_10_6)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined (__NetBSD__)
++#if (defined(__APPLE__) && defined(MAC_OS_10_6_DETECTED)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined (__NetBSD__)
+ #define HAVE_KQUEUE 1
+ #endif
+ 
+@@ -248,7 +252,7 @@ void setproctitle(const char *fmt, ...);
+ #include <kernel/OS.h>
+ #define redis_set_thread_title(name) rename_thread(find_thread(0), name)
+ #else
+-#if (defined __APPLE__ && defined(MAC_OS_X_VERSION_10_7))
++#if (defined __APPLE__ && defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 1070)
+ int pthread_setname_np(const char *name);
+ #include <pthread.h>
+ #define redis_set_thread_title(name) pthread_setname_np(name)
+diff --git a/src/debug.c b/src/debug.c
+index ea6a3f397..bb76c5d17 100644
+--- a/src/debug.c
++++ b/src/debug.c
+@@ -1042,7 +1042,7 @@ static void* getAndSetMcontextEip(ucontext_t *uc, void *eip) {
+     } \
+     return old_val; \
+ } while(0)
+-#if defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_6)
++#if defined(__APPLE__) && !defined(MAC_OS_10_6_DETECTED)
+     /* OSX < 10.6 */
+     #if defined(__x86_64__)
+     GET_SET_RETURN(uc->uc_mcontext->__ss.__rip, eip);
+@@ -1051,7 +1051,7 @@ static void* getAndSetMcontextEip(ucontext_t *uc, void *eip) {
+     #else
+     GET_SET_RETURN(uc->uc_mcontext->__ss.__srr0, eip);
+     #endif
+-#elif defined(__APPLE__) && defined(MAC_OS_X_VERSION_10_6)
++#elif defined(__APPLE__) && defined(MAC_OS_10_6_DETECTED)
+     /* OSX >= 10.6 */
+     #if defined(_STRUCT_X86_THREAD_STATE64) && !defined(__i386__)
+     GET_SET_RETURN(uc->uc_mcontext->__ss.__rip, eip);
+@@ -1123,7 +1123,7 @@ void logRegisters(ucontext_t *uc) {
+     serverLog(LL_WARNING|LL_RAW, "\n------ REGISTERS ------\n");
+ 
+ /* OSX */
+-#if defined(__APPLE__) && defined(MAC_OS_X_VERSION_10_6)
++#if defined(__APPLE__) && defined(MAC_OS_10_6_DETECTED)
+   /* OSX AMD64 */
+     #if defined(_STRUCT_X86_THREAD_STATE64) && !defined(__i386__)
+     serverLog(LL_WARNING,
