@@ -14,6 +14,7 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
+          - macos-14
           - macos-11
         redis:
           - "4.0.14"
@@ -42,9 +43,21 @@ jobs:
       - name: upload
         run: |
           ACTIONS_VERSION=v$(jq -r .version < "$GITHUB_WORKSPACE/package.json")
-          OS=$(uname | tr '[:upper:]' '[:lower:]')
-          mv "$RUNNER_TEMP/redis-bin.tar.zstd" "$RUNNER_TEMP/redis-$REDIS_VERSION-$OS-x64.tar.zstd"
-          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/redis-$REDIS_VERSION-$OS-x64.tar.zstd"
+          REDIS_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+          case "$(uname -m)" in
+              "x86_64")
+                  REDIS_ARCH="x64"
+                  ;;
+              "arm64")
+                  REDIS_ARCH="arm64"
+                  ;;
+              *)
+                  echo "unsupported architecture: $(uname -m)"
+                  exit 1
+                  ;;
+          esac
+          mv "$RUNNER_TEMP/redis-bin.tar.zstd" "$RUNNER_TEMP/redis-$REDIS_VERSION-$REDIS_OS-$REDIS_ARCH.tar.zstd"
+          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/redis-$REDIS_VERSION-$REDIS_OS-$REDIS_ARCH.tar.zstd"
         env:
           REDIS_VERSION: ${{ matrix.redis }}
           GITHUB_TOKEN: ${{ github.token }}

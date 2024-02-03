@@ -10,10 +10,18 @@ REDIS_VERSION=$1
 mkdir -p "$RUNNER_TEMP"
 curl -sSL "https://github.com/redis/redis/archive/$REDIS_VERSION.tar.gz" -o "$RUNNER_TEMP/redis.tar.gz"
 
-# build
+# unarchive source code
 cd "$RUNNER_TEMP"
 tar xzf redis.tar.gz
 cd "redis-$REDIS_VERSION"
+
+# apply patches
+if [[ -d "$ROOT/patches/$REDIS_VERSION" ]]
+then
+    cat "$ROOT/patches/$REDIS_VERSION"/*.patch | patch -s -f -p1
+fi
+
+# build
 make
 
 mkdir -p "$RUNNER_TEMP/dist"
