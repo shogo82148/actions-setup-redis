@@ -6,7 +6,20 @@ ROOT=$(cd "$(dirname "$0")" && pwd)
 export REDIS_VERSION=$1
 : "${RUNNER_TEMP:=$ROOT/.work}"
 : "${RUNNER_TOOL_CACHE:=$RUNNER_TEMP/dist}"
-PREFIX=$RUNNER_TOOL_CACHE/redis/$REDIS_VERSION/x64
+case "$(uname -m)" in
+    "x86_64")
+        REDIS_ARCH="x64"
+        ;;
+    "arm64")
+        REDIS_ARCH="arm64"
+        ;;
+    *)
+        echo "unsupported architecture: $(uname -m)"
+        exit 1
+        ;;
+esac
+
+PREFIX=$RUNNER_TOOL_CACHE/redis/$REDIS_VERSION/$REDIS_ARCH
 
 # configure rpath, and detect the number of CPU Core
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -24,7 +37,7 @@ esac
 export LDFLAGS
 
 # bundle OpenSSL for better reproducibility.
-OPENSSL_VERSION=3.2.0
+OPENSSL_VERSION=3.2.1
 mkdir -p "$RUNNER_TEMP"
 cd "$RUNNER_TEMP"
 

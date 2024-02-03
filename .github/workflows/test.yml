@@ -14,6 +14,7 @@ jobs:
         os:
           - ubuntu-22.04
           - ubuntu-20.04
+          - macos-14
           - macos-13
           - macos-12
           - macos-11
@@ -35,8 +36,7 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - id: test
-        run: npm test
+      - run: npm test
 
       - run: npm run build
       - id: setup
@@ -58,6 +58,8 @@ jobs:
         os:
           - ubuntu-22.04
           - ubuntu-20.04
+          - macos-14
+          - macos-13
           - macos-12
           - macos-11
         redis:
@@ -68,10 +70,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set Node.js 16.x
+      - name: Set Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version-file: package.json
           cache: npm
 
       - run: npm ci
@@ -105,10 +107,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set Node.js 16.x
+      - name: Set Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version-file: package.json
           cache: npm
 
       - run: npm ci

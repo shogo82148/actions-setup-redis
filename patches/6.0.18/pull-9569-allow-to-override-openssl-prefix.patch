@@ -1,0 +1,47 @@
+diff --git a/deps/hiredis/Makefile b/deps/hiredis/Makefile
+index 25ac15464..2c8831bb4 100644
+--- a/deps/hiredis/Makefile
++++ b/deps/hiredis/Makefile
+@@ -72,7 +72,12 @@ ifeq ($(USE_SSL),1)
+ endif
+ 
+ ifeq ($(uname_S),Linux)
+-  SSL_LDFLAGS=-lssl -lcrypto
++  ifdef OPENSSL_PREFIX
++    CFLAGS+=-I$(OPENSSL_PREFIX)/include
++    SSL_LDFLAGS+=-L$(OPENSSL_PREFIX)/lib -lssl -lcrypto
++  else
++    SSL_LDFLAGS=-lssl -lcrypto
++  endif
+ else
+   OPENSSL_PREFIX?=/usr/local/opt/openssl
+   CFLAGS+=-I$(OPENSSL_PREFIX)/include
+diff --git a/src/Makefile b/src/Makefile
+index 691d5434e..35913d9f5 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -103,8 +103,7 @@ else
+ ifeq ($(uname_S),Darwin)
+ 	# Darwin
+ 	FINAL_LIBS+= -ldl
+-	OPENSSL_CFLAGS=-I/usr/local/opt/openssl/include
+-	OPENSSL_LDFLAGS=-L/usr/local/opt/openssl/lib
++	OPENSSL_PREFIX?=/opt/homebrew/opt/openssl
+ else
+ ifeq ($(uname_S),AIX)
+         # AIX
+@@ -165,6 +164,14 @@ endif
+ endif
+ endif
+ endif
++
++ifdef OPENSSL_PREFIX
++	OPENSSL_CFLAGS=-I$(OPENSSL_PREFIX)/include
++	OPENSSL_LDFLAGS=-L$(OPENSSL_PREFIX)/lib
++	# Also export OPENSSL_PREFIX so it ends up in deps sub-Makefiles
++	export OPENSSL_PREFIX
++endif
++
+ # Include paths to dependencies
+ FINAL_CFLAGS+= -I../deps/hiredis -I../deps/linenoise -I../deps/lua/src
+ 
