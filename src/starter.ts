@@ -88,6 +88,13 @@ ${configure}
 // generate certificates and keys, and returns the configure for redis.conf.
 // port of https://github.com/redis/redis/blob/763fd0941683eb64190daca6abab1f29a72a772e/utils/gen-test-certs.sh
 async function generateTestCerts(confPath: string, tlsPort: number, redisPath: string): Promise<string> {
+  if (tlsPort === 0) {
+    // TLS is disabled.
+    // skip TLS configuration.
+    core.setOutput("redis-tls-dir", "");
+    return "";
+  }
+
   // search bundled openssl
   const openssl = path.join(redisPath, "openssl");
   if (!(await exists(openssl))) {
