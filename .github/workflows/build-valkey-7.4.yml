@@ -1,0 +1,49 @@
+name: build Redis 7.2
+
+on:
+  push:
+    branches:
+      - "releases/*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+          - macos-14
+          - macos-11
+        valkey:
+          - "7.4.0"
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        shell: bash
+        run: ./build-valkey-with-openssl3.sh "$VALKEY_VERSION"
+        env:
+          VALKEY_VERSION: ${{ matrix.valkey }}
+
+      - name: upload
+        run: |
+          ACTIONS_VERSION=v$(jq -r .version < "$GITHUB_WORKSPACE/package.json")
+          VALKEY_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+          case "$(uname -m)" in
+              "x86_64")
+                  VALKEY_ARCH="x64"
+                  ;;
+              "arm64")
+                  VALKEY_ARCH="arm64"
+                  ;;
+              *)
+                  echo "unsupported architecture: $(uname -m)"
+                  exit 1
+                  ;;
+          esac
+          mv "$RUNNER_TEMP/valkey-bin.tar.zstd" "$RUNNER_TEMP/valkey-$VALKEY_VERSION-$VALKEY_OS-$VALKEY_ARCH.tar.zstd"
+          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/valkey-$VALKEY_VERSION-$VALKEY_OS-$VALKEY_ARCH.tar.zstd"
+        env:
+          VALKEY_VERSION: ${{ matrix.valkey }}
+          GITHUB_TOKEN: ${{ github.token }}
