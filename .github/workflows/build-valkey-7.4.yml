@@ -1,4 +1,4 @@
-name: build Redis 7.2
+name: build Valkey 7.4
 
 on:
   push:
