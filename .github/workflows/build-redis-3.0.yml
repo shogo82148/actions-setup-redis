@@ -1,4 +1,4 @@
-name: build-3.0
+name: build Redis 3.0
 
 on:
   push:
