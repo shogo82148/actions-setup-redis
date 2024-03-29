@@ -31,7 +31,7 @@ interface Matrix {
 
 async function getAvailableVersions(minorVersion: string): Promise<string[]> {
   const promise = new Promise<Workflow>((resolve, reject) => {
-    fs.readFile(path.join(__dirname, "..", ".github", "workflows", `build-${minorVersion}.yml`), (err, data) => {
+    fs.readFile(path.join(__dirname, "..", ".github", "workflows", `build-redis-${minorVersion}.yml`), (err, data) => {
       if (err) {
         reject(err);
       }
