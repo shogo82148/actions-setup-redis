@@ -14,3 +14,5 @@ OPENSSL_VERSION3=$(gh api --jq 'map(select(.ref | test("/openssl-[0-9]+[.][0-9]+
 export OPENSSL_VERSION3
 
 perl -i -pe 's/^OPENSSL_VERSION=.*$/OPENSSL_VERSION=$ENV{OPENSSL_VERSION3}/' build-redis-with-openssl3.sh
+
+perl -i -pe 's/^OPENSSL_VERSION=.*$/OPENSSL_VERSION=$ENV{OPENSSL_VERSION3}/' build-valkey-with-openssl3.sh
