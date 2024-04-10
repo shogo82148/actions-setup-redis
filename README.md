@@ -25,7 +25,7 @@ steps:
   - uses: actions/checkout@v4
   - uses: shogo82148/actions-setup-redis@v1
     with:
-      redis-version: "6.x"
+      redis-version: "7.x"
   - run: redis-cli ping
 ```
 
@@ -42,6 +42,8 @@ jobs:
           - "macOS-latest"
         # - 'windows-latest' # windows is currently not supported.
         redis:
+          - "7.2"
+          - "7.0"
           - "6.2"
           - "6.0"
           - "5.0"
@@ -69,9 +71,9 @@ The version of Redis.
 The `redis-version` input supports the following syntax:
 
 - `latest`: the latest version of stable Redis
-- `6`, `5`, `4`: major versions
-- `6.2`, `6.0`: minor versions
-- `6.2.0`, `6.2.1`: patch versions
+- `7`, `6`, `5`, `4`: major versions
+- `7.2`, `7.0`: minor versions
+- `7.2.0`, `7.2.1`: patch versions
 
 The default value is `latest`.
 The actions supports only stable versions.

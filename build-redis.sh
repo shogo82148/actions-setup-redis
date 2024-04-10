@@ -16,9 +16,9 @@ tar xzf redis.tar.gz
 cd "redis-$REDIS_VERSION"
 
 # apply patches
-if [[ -d "$ROOT/patches/$REDIS_VERSION" ]]
+if [[ -d "$ROOT/patches/redis/$REDIS_VERSION" ]]
 then
-    cat "$ROOT/patches/$REDIS_VERSION"/*.patch | patch -s -f -p1
+    cat "$ROOT/patches/redis/$REDIS_VERSION"/*.patch | patch -s -f -p1
 fi
 
 # build

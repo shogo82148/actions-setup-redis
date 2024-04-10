@@ -37,7 +37,7 @@ esac
 export LDFLAGS
 
 # bundle OpenSSL for better reproducibility.
-OPENSSL_VERSION=3.2.1
+OPENSSL_VERSION=3.3.0
 mkdir -p "$RUNNER_TEMP"
 cd "$RUNNER_TEMP"
 
@@ -91,9 +91,9 @@ echo "::group::build redis"
     cd "redis-$REDIS_VERSION"
 
     # apply patches
-    if [[ -d "$ROOT/patches/$REDIS_VERSION" ]]
+    if [[ -d "$ROOT/patches/redis/$REDIS_VERSION" ]]
     then
-        cat "$ROOT/patches/$REDIS_VERSION"/*.patch | patch -s -f -p1
+        cat "$ROOT/patches/redis/$REDIS_VERSION"/*.patch | patch -s -f -p1
     fi
 
     make "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1

@@ -3,16 +3,15 @@
 set -uex
 
 ROOT=$(cd "$(dirname "$0")" && pwd)
-export REDIS_VERSION=$1
+export VALKEY_VERSION=$1
 : "${RUNNER_TEMP:=$ROOT/.work}"
 : "${RUNNER_TOOL_CACHE:=$RUNNER_TEMP/dist}"
-
 case "$(uname -m)" in
     "x86_64")
-        REDIS_ARCH="x64"
+        VALKEY_ARCH="x64"
         ;;
     "arm64")
-        REDIS_ARCH="arm64"
+        VALKEY_ARCH="arm64"
         ;;
     *)
         echo "unsupported architecture: $(uname -m)"
@@ -20,7 +19,7 @@ case "$(uname -m)" in
         ;;
 esac
 
-PREFIX=$RUNNER_TOOL_CACHE/redis/$REDIS_VERSION/$REDIS_ARCH
+PREFIX=$RUNNER_TOOL_CACHE/valkey/$VALKEY_VERSION/$VALKEY_ARCH
 
 # configure rpath, and detect the number of CPU Core
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -38,7 +37,7 @@ esac
 export LDFLAGS
 
 # bundle OpenSSL for better reproducibility.
-OPENSSL_VERSION=1_1_1w
+OPENSSL_VERSION=3.3.0
 mkdir -p "$RUNNER_TEMP"
 cd "$RUNNER_TEMP"
 
@@ -46,7 +45,7 @@ echo "::group::download OpenSSL source"
 (
     set -eux
     cd "$RUNNER_TEMP"
-    curl --retry 3 -sSL "https://github.com/openssl/openssl/archive/OpenSSL_$OPENSSL_VERSION.tar.gz" -o openssl.tar.gz
+    curl --retry 3 -sSL "https://github.com/openssl/openssl/archive/refs/tags/openssl-$OPENSSL_VERSION.tar.gz" -o openssl.tar.gz
 )
 echo "::endgroup::"
 
@@ -61,55 +60,50 @@ echo "::endgroup::"
 echo "::group::build OpenSSL"
 (
     set -eux
-    TARGET=""
-    case "$OS" in
-        darwin) TARGET="darwin64-$(uname -m)-cc" ;;
-        linux) TARGET="linux-$(uname -m)" ;;
-    esac
-    cd "$RUNNER_TEMP/openssl-OpenSSL_$OPENSSL_VERSION"
-
-    ./Configure --prefix="$PREFIX" "$TARGET"
+    cd "$RUNNER_TEMP/openssl-openssl-$OPENSSL_VERSION"
+    ./Configure --prefix="$PREFIX" --openssldir="$PREFIX" --libdir=lib
     make "-j$JOBS"
     make install_sw install_ssldirs
 
     if [[ $OS = darwin ]]; then
-        install_name_tool -id "@rpath/libcrypto.1.1.dylib" "$PREFIX/lib/libcrypto.1.1.dylib"
-        install_name_tool -id "@rpath/libssl.1.1.dylib" "$PREFIX/lib/libssl.1.1.dylib"
-        install_name_tool -change "$PREFIX/lib/libcrypto.1.1.dylib" "@rpath/libcrypto.1.1.dylib" "$PREFIX/lib/libssl.1.1.dylib"
-        install_name_tool -change "$PREFIX/lib/libcrypto.1.1.dylib" "@rpath/libcrypto.1.1.dylib" "$PREFIX/bin/openssl"
-        install_name_tool -change "$PREFIX/lib/libssl.1.1.dylib" "@rpath/libssl.1.1.dylib" "$PREFIX/bin/openssl"
+        install_name_tool -id "@rpath/libcrypto.3.dylib" "$PREFIX/lib/libcrypto.3.dylib"
+        install_name_tool -id "@rpath/libssl.3.dylib" "$PREFIX/lib/libssl.3.dylib"
+        install_name_tool -change "$PREFIX/lib/libcrypto.3.dylib" "@rpath/libcrypto.3.dylib" "$PREFIX/lib/libssl.3.dylib"
+        install_name_tool -change "$PREFIX/lib/libcrypto.3.dylib" "@rpath/libcrypto.3.dylib" "$PREFIX/bin/openssl"
+        install_name_tool -change "$PREFIX/lib/libssl.3.dylib" "@rpath/libssl.3.dylib" "$PREFIX/bin/openssl"
     fi
 )
 echo "::endgroup::"
 
 # download
-echo "::group::download redis source"
+echo "::group::download Valkey source"
 (
     mkdir -p "$RUNNER_TEMP"
-    curl -sSL "https://github.com/redis/redis/archive/$REDIS_VERSION.tar.gz" -o "$RUNNER_TEMP/redis.tar.gz"
+    # TODO: download stable version of Valkey
+    curl -sSL "https://github.com/valkey-io/valkey/archive/refs/heads/unstable.tar.gz" -o "$RUNNER_TEMP/valkey.tar.gz"
 )
 echo "::endgroup::"
 
 # build
-echo "::group::build redis"
+echo "::group::build valkey"
 (
     cd "$RUNNER_TEMP"
-    tar xzf redis.tar.gz
-    cd "redis-$REDIS_VERSION"
+    tar xzf valkey.tar.gz
+    cd "valkey-unstable"
 
     # apply patches
-    if [[ -d "$ROOT/patches/redis/$REDIS_VERSION" ]]
+    if [[ -d "$ROOT/patches/valkey/$VALKEY_VERSION" ]]
     then
-        cat "$ROOT/patches/redis/$REDIS_VERSION"/*.patch | patch -s -f -p1
+        cat "$ROOT/patches/valkey/$VALKEY_VERSION"/*.patch | patch -s -f -p1
     fi
 
     make "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 )
 echo "::endgroup::"
 
-echo "::group::archive redis binary"
+echo "::group::archive valkey binary"
 (
-    cd "$RUNNER_TEMP/redis-$REDIS_VERSION"
+    cd "$RUNNER_TEMP/valkey-unstable"
     mkdir -p "$PREFIX"
     make install "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 
@@ -118,6 +112,6 @@ echo "::group::archive redis binary"
     rm -rf "$PREFIX/lib/pkgconfig"
 
     cd "$PREFIX"
-    tar --use-compress-program 'zstd -T0 --long=30 --ultra -22' -cf "$RUNNER_TEMP/redis-bin.tar.zstd" .
+    tar --use-compress-program 'zstd -T0 --long=30 --ultra -22' -cf "$RUNNER_TEMP/valkey-bin.tar.zstd" .
 )
 echo "::endgroup::"
