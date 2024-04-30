@@ -1,4 +1,4 @@
-name: build Valkey 7.4
+name: build Valkey 7.2
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
           - macos-14
           - macos-11
         valkey:
-          - "7.4.0"
+          - "7.2.5"
     steps:
       - uses: actions/checkout@v4
       - name: build

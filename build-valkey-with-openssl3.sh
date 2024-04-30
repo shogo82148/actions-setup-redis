@@ -79,8 +79,7 @@ echo "::endgroup::"
 echo "::group::download Valkey source"
 (
     mkdir -p "$RUNNER_TEMP"
-    # TODO: download stable version of Valkey
-    curl -sSL "https://github.com/valkey-io/valkey/archive/refs/heads/unstable.tar.gz" -o "$RUNNER_TEMP/valkey.tar.gz"
+    curl -sSL "https://github.com/valkey-io/valkey/archive/$VALKEY_VERSION.tar.gz" -o "$RUNNER_TEMP/valkey.tar.gz"
 )
 echo "::endgroup::"
 
