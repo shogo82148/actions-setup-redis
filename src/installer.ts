@@ -26,7 +26,7 @@ interface Strategy {
 }
 
 interface Matrix {
-  redis: string[];
+  [key: string]: string[];
 }
 
 async function getAvailableVersions(distribution: string, minorVersion: string): Promise<string[]> {
@@ -44,7 +44,7 @@ async function getAvailableVersions(distribution: string, minorVersion: string):
   });
 
   const info = await promise;
-  return info.jobs.build.strategy.matrix.redis;
+  return info.jobs.build.strategy.matrix[distribution];
 }
 
 export interface Redis {
@@ -52,10 +52,10 @@ export interface Redis {
   version: string;
 }
 
-const minorVersions = {
+const minorVersions: { [key: string]: string[] } = {
   redis: ["7.2", "7.0", "6.2", "6.0", "5.0", "4.0", "3.2", "3.0", "2.8"],
   valkey: ["7.2"],
-} as { [key: string]: string[] };
+};
 
 async function determineVersion(distribution: string, version: string): Promise<Redis> {
   if (version.startsWith("redis-")) {
