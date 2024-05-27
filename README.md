@@ -65,6 +65,25 @@ jobs:
 
 ## Configuration
 
+### distribution
+
+The distribution. The valid values are `redis` or `valkey`. The default value is `redis`.
+You can use `redis-` and `valkey-` prefixes in `redis-version` instead of the `distribution` input.
+For example, the following two workflows install Valkey 7.2.
+
+```yaml
+- uses: shogo82148/actions-setup-redis@v1
+  with:
+    distribution: "valkey"
+    redis-version: "7.2"
+```
+
+```yaml
+- uses: shogo82148/actions-setup-redis@v1
+  with:
+    redis-version: "valkey-7.2"
+```
+
 ### redis-version
 
 The version of Redis.

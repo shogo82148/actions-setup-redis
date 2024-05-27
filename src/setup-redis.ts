@@ -10,6 +10,7 @@ async function run(): Promise<void> {
   }
   try {
     const required = { required: true };
+    const distribution = core.getInput("distribution", required);
     const version = core.getInput("redis-version", required);
     const port = parseInt(core.getInput("redis-port", required));
     const tlsPort = parseInt(core.getInput("redis-tls-port", required));
@@ -17,7 +18,7 @@ async function run(): Promise<void> {
     const configure = core.getInput("redis-conf");
 
     const redisPath = await core.group("install redis", async (): Promise<string> => {
-      return await installer.getRedis(version);
+      return await installer.getRedis(distribution, version);
     });
     if (autoStart) {
       await core.group("start redis", async () => {
