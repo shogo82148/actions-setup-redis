@@ -2,6 +2,10 @@ name: "actions-setup-redis"
 description: "setup redis database"
 author: "ICHINOSE Shogo"
 inputs:
+  distribution:
+    description: the distribution of redis
+    default: "redis"
+    required: true
   redis-version:
     description: the version of redis
     default: "latest"

@@ -79,8 +79,7 @@ echo "::endgroup::"
 echo "::group::download Valkey source"
 (
     mkdir -p "$RUNNER_TEMP"
-    # TODO: download stable version of Valkey
-    curl -sSL "https://github.com/valkey-io/valkey/archive/refs/heads/unstable.tar.gz" -o "$RUNNER_TEMP/valkey.tar.gz"
+    curl -sSL "https://github.com/valkey-io/valkey/archive/$VALKEY_VERSION.tar.gz" -o "$RUNNER_TEMP/valkey.tar.gz"
 )
 echo "::endgroup::"
 
@@ -89,7 +88,7 @@ echo "::group::build valkey"
 (
     cd "$RUNNER_TEMP"
     tar xzf valkey.tar.gz
-    cd "valkey-unstable"
+    cd "valkey-$VALKEY_VERSION"
 
     # apply patches
     if [[ -d "$ROOT/patches/valkey/$VALKEY_VERSION" ]]
@@ -103,7 +102,7 @@ echo "::endgroup::"
 
 echo "::group::archive valkey binary"
 (
-    cd "$RUNNER_TEMP/valkey-unstable"
+    cd "$RUNNER_TEMP/valkey-$VALKEY_VERSION"
     mkdir -p "$PREFIX"
     make install "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 

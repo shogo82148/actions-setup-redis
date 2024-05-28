@@ -26,52 +26,81 @@ interface Strategy {
 }
 
 interface Matrix {
-  redis: string[];
+  [key: string]: string[];
 }
 
-async function getAvailableVersions(minorVersion: string): Promise<string[]> {
+async function getAvailableVersions(distribution: string, minorVersion: string): Promise<string[]> {
   const promise = new Promise<Workflow>((resolve, reject) => {
-    fs.readFile(path.join(__dirname, "..", ".github", "workflows", `build-redis-${minorVersion}.yml`), (err, data) => {
-      if (err) {
-        reject(err);
-      }
-      const info = yaml.load(data.toString()) as Workflow;
-      resolve(info);
-    });
+    fs.readFile(
+      path.join(__dirname, "..", ".github", "workflows", `build-${distribution}-${minorVersion}.yml`),
+      (err, data) => {
+        if (err) {
+          reject(err);
+        }
+        const info = yaml.load(data.toString()) as Workflow;
+        resolve(info);
+      },
+    );
   });
 
   const info = await promise;
-  return info.jobs.build.strategy.matrix.redis;
+  return info.jobs.build.strategy.matrix[distribution];
 }
 
-const minorVersions = ["7.2", "7.0", "6.2", "6.0", "5.0", "4.0", "3.2", "3.0", "2.8"];
+export interface Redis {
+  distribution: string;
+  version: string;
+}
 
-async function determineVersion(version: string): Promise<string> {
-  if (version === "latest") {
-    const availableVersions = await getAvailableVersions(minorVersions[0]);
-    return availableVersions[0];
+const minorVersions: { [key: string]: string[] } = {
+  redis: ["7.2", "7.0", "6.2", "6.0", "5.0", "4.0", "3.2", "3.0", "2.8"],
+  valkey: ["7.2"],
+};
+
+async function determineVersion(distribution: string, version: string): Promise<Redis> {
+  if (version.startsWith("redis-")) {
+    distribution = "redis";
+    version = version.substring("redis-".length);
+  } else if (version.startsWith("valkey-")) {
+    distribution = "valkey";
+    version = version.substring("valkey-".length);
   }
-  for (const minorVersion of minorVersions) {
-    const availableVersions = await getAvailableVersions(minorVersion);
+
+  if (!minorVersions[distribution]) {
+    throw new Error(`unsupported distribution: ${distribution}`);
+  }
+
+  if (version === "latest") {
+    const availableVersions = await getAvailableVersions(distribution, minorVersions[distribution][0]);
+    return {
+      distribution,
+      version: availableVersions[0],
+    };
+  }
+  for (const minorVersion of minorVersions[distribution]) {
+    const availableVersions = await getAvailableVersions(distribution, minorVersion);
     for (const v of availableVersions) {
       if (semver.satisfies(v, version)) {
-        return v;
+        return {
+          distribution,
+          version: v,
+        };
       }
     }
   }
   throw new Error("unable to get latest version");
 }
 
-export async function getRedis(version: string): Promise<string> {
-  const selected = await determineVersion(version);
+export async function getRedis(distribution: string, version: string): Promise<string> {
+  const selected = await determineVersion(distribution, version);
 
   // check cache
   let toolPath: string;
-  toolPath = tc.find("redis", selected);
+  toolPath = tc.find(selected.distribution, selected.version);
 
   if (!toolPath) {
     // download, extract, cache
-    toolPath = await acquireRedis(selected);
+    toolPath = await acquireRedis(selected.distribution, selected.version);
     core.info(`redis tool is cached under ${toolPath}`);
   }
 
@@ -84,11 +113,11 @@ export async function getRedis(version: string): Promise<string> {
   return toolPath;
 }
 
-async function acquireRedis(version: string): Promise<string> {
+async function acquireRedis(distribution: string, version: string): Promise<string> {
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
-  const fileName = getFileName(version);
+  const fileName = getFileName(distribution, version);
   const downloadUrl = await getDownloadUrl(fileName);
   let downloadPath: string | null = null;
   try {
@@ -112,7 +141,7 @@ async function acquireRedis(version: string): Promise<string> {
   return await tc.cacheDir(extPath, "redis", version);
 }
 
-function getFileName(version: string): string {
+function getFileName(distribution: string, version: string): string {
   switch (osPlat) {
     case "linux":
       break;
@@ -121,7 +150,7 @@ function getFileName(version: string): string {
     default:
       throw new Error(`unsupported platform: ${osPlat}`);
   }
-  return `redis-${version}-${osPlat}-${osArch}.tar.zstd`;
+  return `${distribution}-${version}-${osPlat}-${osArch}.tar.zstd`;
 }
 
 interface PackageVersion {

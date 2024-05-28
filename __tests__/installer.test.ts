@@ -29,7 +29,7 @@ describe("installer tests", () => {
   }, 100000);
 
   it("Acquires version of redis if no matching version is installed", async () => {
-    await installer.getRedis("2.x");
+    await installer.getRedis("redis", "2.x");
     const redisDir = path.join(toolDir, "redis", "2.8.24", os.arch());
 
     expect(await exists(`${redisDir}.complete`)).toBe(true);
@@ -38,7 +38,7 @@ describe("installer tests", () => {
 
   it("start and shutdown redis-server", async () => {
     const confPath = await fs.mkdtemp(tempDir + path.sep);
-    const redisPath = await installer.getRedis("4.x");
+    const redisPath = await installer.getRedis("redis", "4.x");
     const cli = path.join(redisPath, "redis-cli");
     await starter.startRedis({
       confPath,
