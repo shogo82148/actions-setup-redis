@@ -32,6 +32,10 @@ jobs:
           - "4.0.2"
           - "4.0.1"
           - "4.0.0"
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@v4
       - name: build
@@ -61,3 +65,6 @@ jobs:
         env:
           REDIS_VERSION: ${{ matrix.redis }}
           GITHUB_TOKEN: ${{ github.token }}
+      - uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: ${{ runner.temp }}/*.tar.zstd
