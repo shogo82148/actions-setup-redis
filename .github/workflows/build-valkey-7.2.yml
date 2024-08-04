@@ -15,9 +15,13 @@ jobs:
         os:
           - ubuntu-20.04
           - macos-14
-          - macos-11
+          - macos-12
         valkey:
           - "7.2.5"
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@v4
       - name: build
@@ -47,3 +51,6 @@ jobs:
         env:
           VALKEY_VERSION: ${{ matrix.valkey }}
           GITHUB_TOKEN: ${{ github.token }}
+      - uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: ${{ runner.temp }}/*.tar.zstd
