@@ -1,0 +1,56 @@
+name: build Redis 7.4
+
+on:
+  push:
+    branches:
+      - "releases/*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+          - macos-14
+          - macos-12
+        redis:
+          - "7.4.0"
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        shell: bash
+        run: ./build-redis-with-openssl3.sh "$REDIS_VERSION"
+        env:
+          REDIS_VERSION: ${{ matrix.redis }}
+
+      - name: upload
+        run: |
+          ACTIONS_VERSION=v$(jq -r .version < "$GITHUB_WORKSPACE/package.json")
+          REDIS_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+          case "$(uname -m)" in
+              "x86_64")
+                  REDIS_ARCH="x64"
+                  ;;
+              "arm64")
+                  REDIS_ARCH="arm64"
+                  ;;
+              *)
+                  echo "unsupported architecture: $(uname -m)"
+                  exit 1
+                  ;;
+          esac
+          mv "$RUNNER_TEMP/redis-bin.tar.zstd" "$RUNNER_TEMP/redis-$REDIS_VERSION-$REDIS_OS-$REDIS_ARCH.tar.zstd"
+          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/redis-$REDIS_VERSION-$REDIS_OS-$REDIS_ARCH.tar.zstd"
+        env:
+          REDIS_VERSION: ${{ matrix.redis }}
+          GITHUB_TOKEN: ${{ github.token }}
+      - uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: ${{ runner.temp }}/*.tar.zstd
