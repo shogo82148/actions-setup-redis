@@ -98,14 +98,15 @@ echo "::group::build redis"
         cat "$ROOT/patches/redis/$REDIS_VERSION"/*.patch | patch -s -f -p1
     fi
 
-    mkdir -p "$PREFIX"
-    make install "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
+    make "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 )
 echo "::endgroup::"
 
 echo "::group::archive redis binary"
 (
     cd "$RUNNER_TEMP/redis-$REDIS_VERSION"
+    mkdir -p "$PREFIX"
+    make install "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 
     # remove dev packages
     rm -rf "$PREFIX/include"
