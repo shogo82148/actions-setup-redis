@@ -30,8 +30,10 @@ case "$OS" in
     ;;
     linux)
         # shellcheck disable=SC2016
-        LDFLAGS=-Wl,-rpath,'\$$ORIGIN/../lib'
+        LDFLAGS=-Wl,-rpath,'\$${ORIGIN}/../lib'
         JOBS=$(nproc 2>/dev/null)
+        # shellcheck disable=SC2016
+        export ORIGIN='${ORIGIN}'
     ;;
 esac
 export LDFLAGS
