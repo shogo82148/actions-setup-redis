@@ -98,15 +98,14 @@ echo "::group::build valkey"
         cat "$ROOT/patches/valkey/$VALKEY_VERSION"/*.patch | patch -s -f -p1
     fi
 
-    make "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
+    mkdir -p "$PREFIX"
+    make install "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 )
 echo "::endgroup::"
 
 echo "::group::archive valkey binary"
 (
     cd "$RUNNER_TEMP/valkey-$VALKEY_VERSION"
-    mkdir -p "$PREFIX"
-    make install "-j$JOBS" PREFIX="$PREFIX" BUILD_TLS=yes OPENSSL_PREFIX="$PREFIX" V=1
 
     # remove dev packages
     rm -rf "$PREFIX/include"
