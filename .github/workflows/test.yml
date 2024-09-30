@@ -71,6 +71,7 @@ jobs:
           - "7.2"
           - "7.4"
           - "valkey-7.2"
+          - "valkey-8.0"
 
     steps:
       - name: Checkout
