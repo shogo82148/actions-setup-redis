@@ -15,7 +15,7 @@ jobs:
         os:
           - ubuntu-20.04
           - macos-14
-          - macos-12
+          - macos-13
         redis:
           - "7.4.0"
     permissions:

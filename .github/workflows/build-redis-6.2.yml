@@ -15,7 +15,7 @@ jobs:
         os:
           - ubuntu-20.04
           - macos-14
-          - macos-12
+          - macos-13
         redis:
           - "6.2.14"
           - "6.2.13"
