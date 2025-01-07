@@ -25,9 +25,7 @@ interface Strategy {
   matrix: Matrix;
 }
 
-interface Matrix {
-  [key: string]: string[];
-}
+type Matrix = Record<string, string[]>;
 
 async function getAvailableVersions(distribution: string, minorVersion: string): Promise<string[]> {
   const promise = new Promise<Workflow>((resolve, reject) => {
@@ -52,9 +50,9 @@ export interface Redis {
   version: string;
 }
 
-const minorVersions: { [key: string]: string[] } = {
+const minorVersions: Record<string, string[]> = {
   redis: ["7.4", "7.2", "7.0", "6.2", "6.0", "5.0", "4.0", "3.2", "3.0", "2.8"],
-  valkey: ["7.2"],
+  valkey: ["8.0", "7.2"],
 };
 
 async function determineVersion(distribution: string, version: string): Promise<Redis> {

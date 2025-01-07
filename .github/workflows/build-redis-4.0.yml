@@ -15,7 +15,7 @@ jobs:
         os:
           - ubuntu-20.04
           - macos-14
-          - macos-12
+          - macos-13
         redis:
           - "4.0.14"
           - "4.0.13"
@@ -65,6 +65,6 @@ jobs:
         env:
           REDIS_VERSION: ${{ matrix.redis }}
           GITHUB_TOKEN: ${{ github.token }}
-      - uses: actions/attest-build-provenance@v1
+      - uses: actions/attest-build-provenance@v2
         with:
           subject-path: ${{ runner.temp }}/*.tar.zstd

@@ -15,9 +15,9 @@ jobs:
           - ubuntu-24.04
           - ubuntu-22.04
           - ubuntu-20.04
+          - macos-15
           - macos-14
           - macos-13
-          - macos-12
         redis:
           # The latest version that supports OpenSSL 1.1.1
           - "6.2"
@@ -26,7 +26,7 @@ jobs:
           - "7.2"
 
           # The latest version of Valkey
-          - "valkey-7.2"
+          - "valkey-8.0"
 
     steps:
       - name: Checkout
@@ -62,15 +62,16 @@ jobs:
           - ubuntu-24.04
           - ubuntu-22.04
           - ubuntu-20.04
+          - macos-15
           - macos-14
           - macos-13
-          - macos-12
         redis:
           - "6.2"
           - "7.0"
           - "7.2"
           - "7.4"
           - "valkey-7.2"
+          - "valkey-8.0"
 
     steps:
       - name: Checkout

@@ -15,7 +15,7 @@ jobs:
         os:
           - ubuntu-20.04
           - macos-14
-          - macos-12
+          - macos-13
         valkey:
           - "7.2.5"
     permissions:
@@ -51,6 +51,6 @@ jobs:
         env:
           VALKEY_VERSION: ${{ matrix.valkey }}
           GITHUB_TOKEN: ${{ github.token }}
-      - uses: actions/attest-build-provenance@v1
+      - uses: actions/attest-build-provenance@v2
         with:
           subject-path: ${{ runner.temp }}/*.tar.zstd
