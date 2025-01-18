@@ -10,7 +10,7 @@ case "$(uname -m)" in
     "x86_64")
         REDIS_ARCH="x64"
         ;;
-    "arm64")
+    "arm64" | "aarch64")
         REDIS_ARCH="arm64"
         ;;
     *)

@@ -14,6 +14,7 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
+          - ubuntu-22.04-arm
           - macos-14
           - macos-13
         redis:
@@ -58,7 +59,7 @@ jobs:
               "x86_64")
                   REDIS_ARCH="x64"
                   ;;
-              "arm64")
+              "arm64" | "aarch64")
                   REDIS_ARCH="arm64"
                   ;;
               *)
