@@ -10,7 +10,7 @@ case "$(uname -m)" in
     "x86_64")
         VALKEY_ARCH="x64"
         ;;
-    "arm64")
+    "arm64" | "aarch64")
         VALKEY_ARCH="arm64"
         ;;
     *)
