@@ -26,7 +26,7 @@ jobs:
       id-token: write
       attestations: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: build
         shell: bash
         run: ./build-valkey-with-openssl3.sh "$VALKEY_VERSION"
@@ -54,6 +54,6 @@ jobs:
         env:
           VALKEY_VERSION: ${{ matrix.valkey }}
           GITHUB_TOKEN: ${{ github.token }}
-      - uses: actions/attest-build-provenance@v2
+      - uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
         with:
           subject-path: ${{ runner.temp }}/*.tar.zstd
