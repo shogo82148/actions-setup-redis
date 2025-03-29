@@ -10,6 +10,7 @@ async function run(): Promise<void> {
   }
   try {
     const required = { required: true };
+    const githubToken = core.getInput("github-token");
     const distribution = core.getInput("distribution", required);
     const version = core.getInput("redis-version", required);
     const port = parseInt(core.getInput("redis-port", required));
@@ -18,19 +19,13 @@ async function run(): Promise<void> {
     const configure = core.getInput("redis-conf");
 
     const redisPath = await core.group("install redis", async (): Promise<string> => {
-      return await installer.getRedis(distribution, version);
+      return await installer.getRedis(distribution, version, githubToken);
     });
     if (autoStart) {
       await core.group("start redis", async () => {
         const tempDir = process.env["RUNNER_TEMP"] || "/tmp";
         const confPath = await fs.mkdtemp(tempDir + path.sep);
-        await starter.startRedis({
-          confPath,
-          redisPath,
-          port,
-          tlsPort,
-          configure,
-        });
+        await starter.startRedis({ confPath, redisPath, port, tlsPort, configure });
       });
     }
   } catch (error) {
