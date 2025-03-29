@@ -13,6 +13,8 @@ import * as installer from "../src/installer";
 import * as starter from "../src/starter";
 import * as cleanup from "../src/cleanup";
 
+const githubToken = process.env["GITHUB_TOKEN"] || "";
+
 describe("installer tests", () => {
   beforeAll(async () => {
     await io.rmRF(toolDir);
@@ -29,7 +31,7 @@ describe("installer tests", () => {
   }, 100000);
 
   it("Acquires version of redis if no matching version is installed", async () => {
-    await installer.getRedis("redis", "2.x");
+    await installer.getRedis("redis", "2.x", githubToken);
     const redisDir = path.join(toolDir, "redis", "2.8.24", os.arch());
 
     expect(await exists(`${redisDir}.complete`)).toBe(true);
@@ -38,21 +40,13 @@ describe("installer tests", () => {
 
   it("start and shutdown redis-server", async () => {
     const confPath = await fs.mkdtemp(tempDir + path.sep);
-    const redisPath = await installer.getRedis("redis", "4.x");
+    const redisPath = await installer.getRedis("redis", "4.x", githubToken);
     const cli = path.join(redisPath, "redis-cli");
-    await starter.startRedis({
-      confPath,
-      redisPath,
-      port: 6379,
-      tlsPort: 0,
-      configure: "",
-    });
+    await starter.startRedis({ confPath, redisPath, port: 6379, tlsPort: 0, configure: "" });
     await cleanup.shutdownRedis(cli, path.join(confPath, "s"));
 
     // this command will fail, because the redis-server will be shutdown by cleanup.shutdownRedis();
-    const option = {
-      ignoreReturnCode: true,
-    };
+    const option = { ignoreReturnCode: true };
     const exitCode = await exec.exec(cli, ["-h", "127.0.0.1", "-p", "6379", "shutdown"], option);
     expect(exitCode).toBeGreaterThan(0);
   }, 100000);
