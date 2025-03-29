@@ -16,6 +16,7 @@ on:
 
 jobs:
   analyze:
+    timeout-minutes: 12
     name: Analyze
     runs-on: ubuntu-latest
 

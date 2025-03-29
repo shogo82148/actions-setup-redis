@@ -7,6 +7,7 @@ on:
 
 jobs:
   test:
+    timeout-minutes: 13
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -56,6 +57,7 @@ jobs:
         run: redis-cli -s "${{ steps.setup.outputs.redis-unix-socket }}" ping
 
   test-tls:
+    timeout-minutes: 21
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -113,6 +115,7 @@ jobs:
             ping
 
   lint:
+    timeout-minutes: 11
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
