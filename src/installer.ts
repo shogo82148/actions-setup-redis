@@ -5,6 +5,7 @@ import * as path from "path";
 import * as semver from "semver";
 import * as tc from "@actions/tool-cache";
 import * as yaml from "js-yaml";
+import { verify } from "@shogo82148/attestation-verify";
 
 const osPlat = os.platform();
 const osArch = os.arch();
@@ -70,26 +71,20 @@ async function determineVersion(distribution: string, version: string): Promise<
 
   if (version === "latest") {
     const availableVersions = await getAvailableVersions(distribution, minorVersions[distribution][0]);
-    return {
-      distribution,
-      version: availableVersions[0],
-    };
+    return { distribution, version: availableVersions[0] };
   }
   for (const minorVersion of minorVersions[distribution]) {
     const availableVersions = await getAvailableVersions(distribution, minorVersion);
     for (const v of availableVersions) {
       if (semver.satisfies(v, version)) {
-        return {
-          distribution,
-          version: v,
-        };
+        return { distribution, version: v };
       }
     }
   }
   throw new Error("unable to get latest version");
 }
 
-export async function getRedis(distribution: string, version: string): Promise<string> {
+export async function getRedis(distribution: string, version: string, githubToken: string): Promise<string> {
   const selected = await determineVersion(distribution, version);
 
   // check cache
@@ -98,7 +93,7 @@ export async function getRedis(distribution: string, version: string): Promise<s
 
   if (!toolPath) {
     // download, extract, cache
-    toolPath = await acquireRedis(selected.distribution, selected.version);
+    toolPath = await acquireRedis(selected.distribution, selected.version, githubToken);
     core.info(`redis tool is cached under ${toolPath}`);
   }
 
@@ -111,7 +106,7 @@ export async function getRedis(distribution: string, version: string): Promise<s
   return toolPath;
 }
 
-async function acquireRedis(distribution: string, version: string): Promise<string> {
+async function acquireRedis(distribution: string, version: string, githubToken: string): Promise<string> {
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
@@ -121,6 +116,9 @@ async function acquireRedis(distribution: string, version: string): Promise<stri
   try {
     core.info(`downloading the binary from ${downloadUrl}`);
     downloadPath = await tc.downloadTool(downloadUrl);
+    core.info(`downloaded to ${downloadPath}`);
+    core.info(`verifying the binary...`);
+    await verify(downloadPath, { githubToken: githubToken, repository: "shogo82148/actions-setup-redis" });
   } catch (error) {
     if (error instanceof Error) {
       core.debug(`error: name: ${error.name}, message: ${error.message}`);
