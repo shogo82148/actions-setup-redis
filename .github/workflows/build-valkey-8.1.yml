@@ -1,4 +1,4 @@
-name: build Valkey 8.0
+name: build Valkey 8.1
 
 on:
   push:
