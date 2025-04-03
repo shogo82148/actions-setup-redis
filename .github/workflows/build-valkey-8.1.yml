@@ -1,0 +1,60 @@
+name: build Valkey 8.0
+
+on:
+  push:
+    branches:
+      - "releases/*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    timeout-minutes: 17
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+          - ubuntu-22.04-arm
+          - macos-14
+          - macos-13
+        valkey:
+          - "8.1.0"
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: "false"
+      - name: build
+        shell: bash
+        run: ./build-valkey-with-openssl3.sh "$VALKEY_VERSION"
+        env:
+          VALKEY_VERSION: ${{ matrix.valkey }}
+
+      - name: upload
+        run: |
+          ACTIONS_VERSION=v$(jq -r .version < "$GITHUB_WORKSPACE/package.json")
+          VALKEY_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+          case "$(uname -m)" in
+              "x86_64")
+                  VALKEY_ARCH="x64"
+                  ;;
+              "arm64" | "aarch64")
+                  VALKEY_ARCH="arm64"
+                  ;;
+              *)
+                  echo "unsupported architecture: $(uname -m)"
+                  exit 1
+                  ;;
+          esac
+          mv "$RUNNER_TEMP/valkey-bin.tar.zstd" "$RUNNER_TEMP/valkey-$VALKEY_VERSION-$VALKEY_OS-$VALKEY_ARCH.tar.zstd"
+          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/valkey-$VALKEY_VERSION-$VALKEY_OS-$VALKEY_ARCH.tar.zstd"
+        env:
+          VALKEY_VERSION: ${{ matrix.valkey }}
+          GITHUB_TOKEN: ${{ github.token }}
+      - uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        with:
+          subject-path: ${{ runner.temp }}/*.tar.zstd
