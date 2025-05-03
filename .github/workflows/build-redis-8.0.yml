@@ -1,4 +1,4 @@
-name: build Redis 7.4
+name: build Redis 8.0
 
 on:
   push:
