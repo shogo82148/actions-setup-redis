@@ -19,7 +19,6 @@ jobs:
           - ubuntu-22.04-arm
           - ubuntu-24.04
           - ubuntu-22.04
-          - ubuntu-20.04
           - macos-15
           - macos-14
           - macos-13
@@ -40,7 +39,7 @@ jobs:
           persist-credentials: "false"
 
       - name: Set Node.js
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: package.json
           cache: npm
@@ -75,7 +74,6 @@ jobs:
           - ubuntu-22.04-arm
           - ubuntu-24.04
           - ubuntu-22.04
-          - ubuntu-20.04
           - macos-15
           - macos-14
           - macos-13
@@ -84,8 +82,10 @@ jobs:
           - "7.0"
           - "7.2"
           - "7.4"
+          - "8.0"
           - "valkey-7.2"
           - "valkey-8.0"
+          - "valkey-8.1"
 
     steps:
       - name: Checkout
@@ -94,7 +94,7 @@ jobs:
           persist-credentials: "false"
 
       - name: Set Node.js
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: package.json
           cache: npm
@@ -136,7 +136,7 @@ jobs:
           persist-credentials: "false"
 
       - name: Set Node.js
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: package.json
           cache: npm

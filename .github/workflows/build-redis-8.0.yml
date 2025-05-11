@@ -1,4 +1,4 @@
-name: build Redis 5.0
+name: build Redis 8.0
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    timeout-minutes: 12
+    timeout-minutes: 16
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -19,21 +19,7 @@ jobs:
           - macos-14
           - macos-13
         redis:
-          - "5.0.14"
-          - "5.0.13"
-          - "5.0.12"
-          - "5.0.11"
-          - "5.0.10"
-          - "5.0.9"
-          - "5.0.8"
-          - "5.0.7"
-          - "5.0.6"
-          - "5.0.5"
-          - "5.0.4"
-          - "5.0.3"
-          - "5.0.2"
-          - "5.0.1"
-          - "5.0.0"
+          - "8.0.0"
     permissions:
       contents: write
       id-token: write
@@ -44,7 +30,7 @@ jobs:
           persist-credentials: "false"
       - name: build
         shell: bash
-        run: ./build-redis.sh "$REDIS_VERSION"
+        run: ./build-redis-with-openssl3.sh "$REDIS_VERSION"
         env:
           REDIS_VERSION: ${{ matrix.redis }}
 
