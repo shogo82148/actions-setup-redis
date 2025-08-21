@@ -39,7 +39,7 @@
     "@types/eslint__js": "^8.42.3",
     "@types/jest": "^29.5.14",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20.6.0",
+    "@types/node": "^20.19.11",
     "@types/semver": "^7.7.0",
     "eslint": "^9.32.0",
     "jest": "^30.0.0",
