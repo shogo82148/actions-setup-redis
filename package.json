@@ -40,7 +40,7 @@
     "@types/jest": "^29.5.14",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.19.11",
-    "@types/semver": "^7.7.0",
+    "@types/semver": "^7.7.1",
     "eslint": "^9.34.0",
     "jest": "^30.0.0",
     "prettier": "^3.6.2",
