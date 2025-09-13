@@ -1,4 +1,4 @@
-name: build Redis 7.4
+name: build Redis 8.2
 
 on:
   push:
@@ -19,12 +19,7 @@ jobs:
           - macos-14
           - macos-13
         redis:
-          - "7.4.5"
-          - "7.4.4"
-          - "7.4.3"
-          - "7.4.2"
-          - "7.4.1"
-          - "7.4.0"
+          - "8.2.0"
     permissions:
       contents: write
       id-token: write
