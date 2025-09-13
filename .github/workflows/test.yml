@@ -19,6 +19,7 @@ jobs:
           - ubuntu-22.04-arm
           - ubuntu-24.04
           - ubuntu-22.04
+          - macos-26
           - macos-15
           - macos-14
           - macos-13
@@ -74,6 +75,7 @@ jobs:
           - ubuntu-22.04-arm
           - ubuntu-24.04
           - ubuntu-22.04
+          - macos-26
           - macos-15
           - macos-14
           - macos-13
