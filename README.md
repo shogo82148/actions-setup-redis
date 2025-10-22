@@ -4,7 +4,7 @@
   <a href="https://github.com/shogo82148/actions-setup-redis"><img alt="GitHub Actions status" src="https://github.com/shogo82148/actions-setup-redis/workflows/Test/badge.svg"></a>
 </p>
 
-This action sets by [redis](https://redis.io/) database for use in actions by:
+This action sets by [redis](https://redis.io/)/[valkey](https://valkey.io/) database for use in actions by:
 
 - optionally downloading and caching a version of redis
 - start redis-server
