@@ -27,11 +27,11 @@ jobs:
           # The latest version that supports OpenSSL 1.1.1
           - "6.2"
 
-          # Ths latest version of Redis
-          - "7.2"
+          # The latest version of Redis
+          - "8.2"
 
           # The latest version of Valkey
-          - "valkey-8.0"
+          - "valkey-9.1"
 
     steps:
       - name: Checkout
@@ -89,6 +89,7 @@ jobs:
           - "valkey-7.2"
           - "valkey-8.0"
           - "valkey-8.1"
+          - "valkey-9.0"
 
     steps:
       - name: Checkout
