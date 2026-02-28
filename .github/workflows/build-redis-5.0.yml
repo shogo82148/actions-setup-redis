@@ -17,7 +17,7 @@ jobs:
           - ubuntu-22.04
           - ubuntu-22.04-arm
           - macos-14
-          - macos-13
+          - macos-15-intel
         redis:
           - "5.0.14"
           - "5.0.13"

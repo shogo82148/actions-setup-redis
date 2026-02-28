@@ -22,7 +22,7 @@ jobs:
           - macos-26
           - macos-15
           - macos-14
-          - macos-13
+          - macos-15-intel
         redis:
           # The latest version that supports OpenSSL 1.1.1
           - "6.2"
@@ -78,7 +78,7 @@ jobs:
           - macos-26
           - macos-15
           - macos-14
-          - macos-13
+          - macos-15-intel
         redis:
           - "6.2"
           - "7.0"
