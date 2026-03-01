@@ -1,4 +1,4 @@
-name: build Redis 8.0
+name: build Redis 8.6
 
 on:
   push:
@@ -19,13 +19,8 @@ jobs:
           - macos-14
           - macos-15-intel
         redis:
-          - "8.0.6"
-          - "8.0.5"
-          - "8.0.4"
-          - "8.0.3"
-          - "8.0.2"
-          - "8.0.1"
-          - "8.0.0"
+          - "8.6.1"
+          - "8.6.0"
     permissions:
       contents: write
       id-token: write
