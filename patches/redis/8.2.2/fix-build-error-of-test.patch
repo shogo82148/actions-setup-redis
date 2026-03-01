@@ -1,0 +1,13 @@
+diff --git a/tests/modules/Makefile b/tests/modules/Makefile
+index f14123478..f016cc96d 100644
+--- a/tests/modules/Makefile
++++ b/tests/modules/Makefile
+@@ -98,7 +98,7 @@ all: $(TEST_MODULES)
+ 	$(CC) -I../../src $(CFLAGS) $(SHOBJ_CFLAGS) -fPIC -c $< -o $@
+ 
+ %.so: %.xo
+-	$(LD) -o $@ $^ $(SHOBJ_LDFLAGS) $(LDFLAGS) $(LIBS)
++	$(CC) -o $@ $^ $(SHOBJ_LDFLAGS) $(LDFLAGS) $(LIBS)
+ 
+ .PHONY: clean
+ 
