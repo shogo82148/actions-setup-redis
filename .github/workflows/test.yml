@@ -80,17 +80,13 @@ jobs:
           - macos-14
           - macos-15-intel
         redis:
+          # The latest version that supports OpenSSL 1.1.1
           - "6.2"
-          - "7.0"
-          - "7.2"
-          - "7.4"
-          - "8.0"
-          - "8.2"
-          - "8.4"
+
+          # The latest version of Redis
           - "8.6"
-          - "valkey-7.2"
-          - "valkey-8.0"
-          - "valkey-8.1"
+
+          # The latest version of Valkey
           - "valkey-9.0"
 
     steps:
