@@ -25,7 +25,7 @@ PREFIX=$RUNNER_TOOL_CACHE/redis/$REDIS_VERSION/$REDIS_ARCH
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 case "$OS" in
     darwin)
-        LDFLAGS=-Wl,-rpath,'@executable_path/../lib'
+        LDFLAGS=-rpath,'@executable_path/../lib'
         JOBS=$(sysctl -n hw.logicalcpu_max 2>/dev/null)
     ;;
     linux)
