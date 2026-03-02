@@ -1,4 +1,4 @@
-name: build Valkey 7.2
+name: build Redis 8.4
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    timeout-minutes: 18
+    timeout-minutes: 16
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -18,15 +18,10 @@ jobs:
           - ubuntu-22.04-arm
           - macos-14
           - macos-15-intel
-        valkey:
-          - "7.2.12"
-          - "7.2.11"
-          - "7.2.10"
-          - "7.2.9"
-          - "7.2.8"
-          - "7.2.7"
-          - "7.2.6"
-          - "7.2.5"
+        redis:
+          - "8.4.2"
+          - "8.4.1"
+          - "8.4.0"
     permissions:
       contents: write
       id-token: write
@@ -37,30 +32,30 @@ jobs:
           persist-credentials: "false"
       - name: build
         shell: bash
-        run: ./build-valkey-with-openssl3.sh "$VALKEY_VERSION"
+        run: ./build-redis-with-openssl3.sh "$REDIS_VERSION"
         env:
-          VALKEY_VERSION: ${{ matrix.valkey }}
+          REDIS_VERSION: ${{ matrix.redis }}
 
       - name: upload
         run: |
           ACTIONS_VERSION=v$(jq -r .version < "$GITHUB_WORKSPACE/package.json")
-          VALKEY_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+          REDIS_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
           case "$(uname -m)" in
               "x86_64")
-                  VALKEY_ARCH="x64"
+                  REDIS_ARCH="x64"
                   ;;
               "arm64" | "aarch64")
-                  VALKEY_ARCH="arm64"
+                  REDIS_ARCH="arm64"
                   ;;
               *)
                   echo "unsupported architecture: $(uname -m)"
                   exit 1
                   ;;
           esac
-          mv "$RUNNER_TEMP/valkey-bin.tar.zstd" "$RUNNER_TEMP/valkey-$VALKEY_VERSION-$VALKEY_OS-$VALKEY_ARCH.tar.zstd"
-          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/valkey-$VALKEY_VERSION-$VALKEY_OS-$VALKEY_ARCH.tar.zstd"
+          mv "$RUNNER_TEMP/redis-bin.tar.zstd" "$RUNNER_TEMP/redis-$REDIS_VERSION-$REDIS_OS-$REDIS_ARCH.tar.zstd"
+          gh release upload --clobber "$ACTIONS_VERSION" "$RUNNER_TEMP/redis-$REDIS_VERSION-$REDIS_OS-$REDIS_ARCH.tar.zstd"
         env:
-          VALKEY_VERSION: ${{ matrix.valkey }}
+          REDIS_VERSION: ${{ matrix.redis }}
           GITHUB_TOKEN: ${{ github.token }}
       - uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
         with:
