@@ -38,7 +38,7 @@ outputs:
   redis-unix-socket:
     description: the unix domain socket that redis-server listens
 runs:
-  using: "node20"
+  using: "node24"
   main: "lib/setup-redis.js"
   post: "lib/cleanup-redis.js"
   post-if: "always()"
