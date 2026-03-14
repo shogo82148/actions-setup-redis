@@ -41,6 +41,12 @@ describe("installer tests", () => {
     expect(await exists(path.join(redisDir, "bin", "redis-server"))).toBe(true);
   }, 100000);
 
+  it("getRedis returns a path where redis-server binary exists", async () => {
+    const redisPath = await installer.getRedis("redis", "4.x", githubToken);
+    const redisServerPath = path.join(redisPath, "redis-server");
+    expect(await exists(redisServerPath)).toBe(true);
+  }, 100000);
+
   it("start and shutdown redis-server", async () => {
     const confPath = await fs.mkdtemp(tempDir + path.sep);
     const redisPath = await installer.getRedis("redis", "4.x", githubToken);
