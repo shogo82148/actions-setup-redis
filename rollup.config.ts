@@ -5,6 +5,8 @@ import json from "@rollup/plugin-json";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 
+const sharedPlugins = () => [typescript(), nodeResolve({ preferBuiltins: true }), commonjs(), json()];
+
 const config = [
   {
     input: "src/setup-redis.ts",
@@ -15,7 +17,7 @@ const config = [
       inlineDynamicImports: true,
       sourcemap: true,
     },
-    plugins: [typescript(), nodeResolve({ preferBuiltins: true }), commonjs(), json()],
+    plugins: sharedPlugins(),
   },
   {
     input: "src/cleanup-redis.ts",
@@ -26,7 +28,7 @@ const config = [
       inlineDynamicImports: true,
       sourcemap: true,
     },
-    plugins: [typescript(), nodeResolve({ preferBuiltins: true }), commonjs(), json()],
+    plugins: sharedPlugins(),
   },
 ];
 
