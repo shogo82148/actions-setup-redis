@@ -3,15 +3,18 @@ import * as exec from "@actions/exec";
 import { promises as fs } from "fs";
 import * as path from "path";
 import * as os from "os";
+import { fileURLToPath } from "url";
+import * as installer from "../src/installer.js";
+import * as starter from "../src/starter.js";
+import * as cleanup from "../src/cleanup.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const toolDir = path.join(__dirname, "r", "tools");
 const tempDir = path.join(__dirname, "r", "tmp");
 
 process.env["RUNNER_TOOL_CACHE"] = toolDir;
 process.env["RUNNER_TEMP"] = tempDir;
-import * as installer from "../src/installer";
-import * as starter from "../src/starter";
-import * as cleanup from "../src/cleanup";
 
 const githubToken = process.env["GITHUB_TOKEN"] || "";
 

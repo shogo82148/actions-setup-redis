@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
-import * as installer from "./installer";
+import * as installer from "./installer.js";
 import * as path from "path";
-import * as starter from "./starter";
+import * as starter from "./starter.js";
 import { promises as fs } from "fs";
 
 async function run(): Promise<void> {

@@ -1,4 +1,4 @@
-import * as cleanup from "./cleanup";
+import * as cleanup from "./cleanup.js";
 import * as core from "@actions/core";
 import * as io from "@actions/io";
 
