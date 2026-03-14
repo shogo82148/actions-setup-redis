@@ -50,7 +50,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - run: npm run build
+      - run: npm run bundle
       - id: setup
         name: use the action
         uses: ./
@@ -102,7 +102,7 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+      - run: npm run bundle
 
       # reproduce https://github.com/shogo82148/actions-setup-redis/issues/693
       - id: tmp
