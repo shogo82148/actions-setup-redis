@@ -9,10 +9,11 @@
     "node": ">=24.0.0"
   },
   "scripts": {
-    "build": "npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
-    "lint": "eslint src/**/*.ts",
+    "bundle": "npm run format:write && npm run package",
+    "package": "npx rimraf ./dist && npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
+    "format:write": "npx prettier --write .",
+    "format:check": "npx prettier --check .",
+    "lint": "npx eslint .",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 npx jest"
   },
   "repository": {
@@ -50,6 +51,7 @@
     "eslint": "^10.0.3",
     "jest": "^30.2.0",
     "prettier": "^3.8.1",
+    "rimraf": "^6.1.3",
     "rollup": "^4.59.0",
     "ts-jest": "^29.4.6",
     "ts-jest-resolver": "^2.0.1",

@@ -42,7 +42,7 @@ jobs:
       - name: Set Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version-file: package.json
+          node-version-file: ".node-version"
           cache: npm
 
       - run: npm ci
@@ -50,7 +50,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - run: npm run build
+      - run: npm run bundle
       - id: setup
         name: use the action
         uses: ./
@@ -98,11 +98,11 @@ jobs:
       - name: Set Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version-file: package.json
+          node-version-file: ".node-version"
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+      - run: npm run bundle
 
       # reproduce https://github.com/shogo82148/actions-setup-redis/issues/693
       - id: tmp
@@ -140,8 +140,8 @@ jobs:
       - name: Set Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version-file: package.json
+          node-version-file: ".node-version"
           cache: npm
 
       - run: npm ci
-      - run: npm run format-check
+      - run: npm run format:check
