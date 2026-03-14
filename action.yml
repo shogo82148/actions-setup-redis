@@ -39,8 +39,8 @@ outputs:
     description: the unix domain socket that redis-server listens
 runs:
   using: "node24"
-  main: "lib/setup-redis.js"
-  post: "lib/cleanup-redis.js"
+  main: "dist/setup-redis.js"
+  post: "dist/cleanup-redis.js"
   post-if: "always()"
 branding:
   icon: "database"

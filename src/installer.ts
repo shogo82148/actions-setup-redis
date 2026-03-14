@@ -9,6 +9,7 @@ import { verify } from "@shogo82148/attestation-verify";
 
 const osPlat = os.platform();
 const osArch = os.arch();
+const dirname = import.meta.dirname;
 
 interface Workflow {
   jobs: Jobs;
@@ -31,7 +32,7 @@ type Matrix = Record<string, string[]>;
 async function getAvailableVersions(distribution: string, minorVersion: string): Promise<string[]> {
   const promise = new Promise<Workflow>((resolve, reject) => {
     fs.readFile(
-      path.join(__dirname, "..", ".github", "workflows", `build-${distribution}-${minorVersion}.yml`),
+      path.join(dirname, "..", ".github", "workflows", `build-${distribution}-${minorVersion}.yml`),
       (err, data) => {
         if (err) {
           reject(err);
@@ -155,7 +156,7 @@ interface PackageVersion {
 
 async function getDownloadUrl(filename: string): Promise<string> {
   const promise = new Promise<PackageVersion>((resolve, reject) => {
-    fs.readFile(path.join(__dirname, "..", "package.json"), (err, data) => {
+    fs.readFile(path.join(dirname, "..", "package.json"), (err, data) => {
       if (err) {
         reject(err);
       }
