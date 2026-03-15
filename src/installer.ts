@@ -59,6 +59,7 @@ function determineVersion(distribution: string, version: string): Version {
   throw new Error(`unable to find ${distribution} version matching "${version}" for ${osPlat}/${osArch}`);
 }
 
+// getRedis returns the path to the directory containing redis-server, redis-cli, etc.
 export async function getRedis(distribution: string, version: string): Promise<string> {
   const selected = determineVersion(distribution, version);
 
