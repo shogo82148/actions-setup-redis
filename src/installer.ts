@@ -56,7 +56,7 @@ function determineVersion(distribution: string, version: string): Version {
       }
     }
   }
-  throw new Error("unable to get latest version");
+  throw new Error(`unable to find ${distribution} version matching "${version}" for ${osPlat}/${osArch}`);
 }
 
 export async function getRedis(distribution: string, version: string): Promise<string> {
