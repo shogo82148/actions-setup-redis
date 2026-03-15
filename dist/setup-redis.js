@@ -66427,6 +66427,7 @@ function determineVersion(distribution, version) {
     }
     throw new Error(`unable to find ${distribution} version matching "${version}" for ${osPlat}/${osArch}`);
 }
+// getRedis returns the path to the directory containing redis-server, redis-cli, etc.
 async function getRedis(distribution, version) {
     const selected = determineVersion(distribution, version);
     // check cache
@@ -67234,6 +67235,7 @@ async function run() {
         const redisPath = await group("install redis", async () => {
             return await getRedis(distribution, version);
         });
+        setOutput("redis-path", redisPath);
         if (autoStart) {
             await group("start redis", async () => {
                 const tempDir = process.env["RUNNER_TEMP"] || "/tmp";

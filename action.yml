@@ -37,6 +37,8 @@ outputs:
     description: the directory path for tls sample certificates/keys
   redis-unix-socket:
     description: the unix domain socket that redis-server listens
+  redis-path:
+    description: The absolute path to the redis-server, redis-cli, etc.
 runs:
   using: "node24"
   main: "dist/setup-redis.js"

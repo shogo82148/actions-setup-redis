@@ -193,6 +193,10 @@ jobs:
 
 See [TLS Support](https://redis.io/topics/encryption) for more details.
 
+### redis-path
+
+The absolute path to the `redis-server`, `redis-cli`, etc.
+
 # License
 
 The scripts and documentation in this project are released under the [MIT License](LICENSE)

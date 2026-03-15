@@ -20,6 +20,7 @@ async function run(): Promise<void> {
     const redisPath = await core.group("install redis", async (): Promise<string> => {
       return await installer.getRedis(distribution, version);
     });
+    core.setOutput("redis-path", redisPath);
     if (autoStart) {
       await core.group("start redis", async () => {
         const tempDir = process.env["RUNNER_TEMP"] || "/tmp";
