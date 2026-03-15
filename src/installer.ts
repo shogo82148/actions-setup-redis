@@ -3,48 +3,21 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as semver from "semver";
+import * as crypto from "crypto";
 import * as tc from "@actions/tool-cache";
-import * as yaml from "js-yaml";
-import { verify } from "@shogo82148/attestation-verify";
+import redisVersions from "./versions/redis.json" with { type: "json" };
+import valkeyVersions from "./versions/valkey.json" with { type: "json" };
 
 const osPlat = os.platform();
 const osArch = os.arch();
-const dirname = import.meta.dirname;
 
-interface Workflow {
-  jobs: Jobs;
-}
-
-interface Jobs {
-  build: Job;
-}
-
-interface Job {
-  strategy: Strategy;
-}
-
-interface Strategy {
-  matrix: Matrix;
-}
-
-type Matrix = Record<string, string[]>;
-
-async function getAvailableVersions(distribution: string, minorVersion: string): Promise<string[]> {
-  const promise = new Promise<Workflow>((resolve, reject) => {
-    fs.readFile(
-      path.join(dirname, "..", ".github", "workflows", `build-${distribution}-${minorVersion}.yml`),
-      (err, data) => {
-        if (err) {
-          reject(err);
-        }
-        const info = yaml.load(data.toString()) as Workflow;
-        resolve(info);
-      },
-    );
-  });
-
-  const info = await promise;
-  return info.jobs.build.strategy.matrix[distribution];
+interface Version {
+  distribution: string;
+  arch: string;
+  os: string;
+  sha256: string;
+  url: string;
+  version: string;
 }
 
 export interface Redis {
@@ -52,12 +25,7 @@ export interface Redis {
   version: string;
 }
 
-const minorVersions: Record<string, string[]> = {
-  redis: ["8.6", "8.4", "8.2", "8.0", "7.4", "7.2", "7.0", "6.2", "6.0", "5.0", "4.0", "3.2", "3.0", "2.8"],
-  valkey: ["9.0", "8.1", "8.0", "7.2"],
-};
-
-async function determineVersion(distribution: string, version: string): Promise<Redis> {
+function determineVersion(distribution: string, version: string): Version {
   if (version.startsWith("redis-")) {
     distribution = "redis";
     version = version.substring("redis-".length);
@@ -66,27 +34,33 @@ async function determineVersion(distribution: string, version: string): Promise<
     version = version.substring("valkey-".length);
   }
 
-  if (!minorVersions[distribution]) {
+  let availableVersions: Version[];
+  if (distribution === "redis") {
+    availableVersions = redisVersions;
+  } else if (distribution === "valkey") {
+    availableVersions = valkeyVersions;
+  } else {
     throw new Error(`unsupported distribution: ${distribution}`);
   }
 
   if (version === "latest") {
-    const availableVersions = await getAvailableVersions(distribution, minorVersions[distribution][0]);
-    return { distribution, version: availableVersions[0] };
-  }
-  for (const minorVersion of minorVersions[distribution]) {
-    const availableVersions = await getAvailableVersions(distribution, minorVersion);
     for (const v of availableVersions) {
-      if (semver.satisfies(v, version)) {
-        return { distribution, version: v };
+      if (v.arch === osArch && v.os === osPlat) {
+        return v;
+      }
+    }
+  } else {
+    for (const v of availableVersions) {
+      if (v.arch === osArch && v.os === osPlat && semver.satisfies(v.version, version)) {
+        return v;
       }
     }
   }
-  throw new Error("unable to get latest version");
+  throw new Error(`unable to find ${distribution} version matching "${version}" for ${osPlat}/${osArch}`);
 }
 
-export async function getRedis(distribution: string, version: string, githubToken: string): Promise<string> {
-  const selected = await determineVersion(distribution, version);
+export async function getRedis(distribution: string, version: string): Promise<string> {
+  const selected = determineVersion(distribution, version);
 
   // check cache
   let toolPath: string;
@@ -94,7 +68,7 @@ export async function getRedis(distribution: string, version: string, githubToke
 
   if (!toolPath) {
     // download, extract, cache
-    toolPath = await acquireRedis(selected.distribution, selected.version, githubToken);
+    toolPath = await acquireRedis(selected.distribution, selected);
     core.info(`redis tool is cached under ${toolPath}`);
   }
 
@@ -107,19 +81,15 @@ export async function getRedis(distribution: string, version: string, githubToke
   return toolPath;
 }
 
-async function acquireRedis(distribution: string, version: string, githubToken: string): Promise<string> {
+async function acquireRedis(distribution: string, version: Version): Promise<string> {
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
-  const fileName = getFileName(distribution, version);
-  const downloadUrl = await getDownloadUrl(fileName);
   let downloadPath: string | null = null;
   try {
-    core.info(`downloading the binary from ${downloadUrl}`);
-    downloadPath = await tc.downloadTool(downloadUrl);
+    core.info(`downloading the binary from ${version.url}`);
+    downloadPath = await tc.downloadTool(version.url);
     core.info(`downloaded to ${downloadPath}`);
-    core.info(`verifying the binary...`);
-    await verify(downloadPath, { githubToken: githubToken, repository: "shogo82148/actions-setup-redis" });
   } catch (error) {
     if (error instanceof Error) {
       core.debug(`error: name: ${error.name}, message: ${error.message}`);
@@ -127,7 +97,18 @@ async function acquireRedis(distribution: string, version: string, githubToken: 
       core.debug(`${error}`);
     }
 
-    throw new Error(`Failed to download version ${version}: ${error}`);
+    throw new Error(`Failed to download ${version.distribution} ${version.version}: ${error}`);
+  }
+
+  //
+  // Verify SHA256
+  //
+  core.info(`verifying the binary...`);
+  const hash = await calculateDigest(downloadPath, "sha256");
+  if (hash !== version.sha256) {
+    throw new Error(
+      `SHA-256 hash mismatch for ${version.distribution} ${version.version}: got ${hash}, expected ${version.sha256}`,
+    );
   }
 
   //
@@ -135,37 +116,16 @@ async function acquireRedis(distribution: string, version: string, githubToken: 
   //
   const extPath = await tc.extractTar(downloadPath, "", ["--use-compress-program", "zstd -d --long=30", "-x"]);
 
-  return await tc.cacheDir(extPath, "redis", version);
+  return await tc.cacheDir(extPath, version.distribution, version.version);
 }
 
-function getFileName(distribution: string, version: string): string {
-  switch (osPlat) {
-    case "linux":
-      break;
-    case "darwin":
-      break;
-    default:
-      throw new Error(`unsupported platform: ${osPlat}`);
-  }
-  return `${distribution}-${version}-${osPlat}-${osArch}.tar.zstd`;
-}
-
-interface PackageVersion {
-  version: string;
-}
-
-async function getDownloadUrl(filename: string): Promise<string> {
-  const promise = new Promise<PackageVersion>((resolve, reject) => {
-    fs.readFile(path.join(dirname, "..", "package.json"), (err, data) => {
-      if (err) {
-        reject(err);
-      }
-      const info: PackageVersion = JSON.parse(data.toString());
-      resolve(info);
-    });
+async function calculateDigest(filename: string, algorithm: string): Promise<string> {
+  const hash = await new Promise<string>((resolve, reject) => {
+    const hash = crypto.createHash(algorithm);
+    const stream = fs.createReadStream(filename);
+    stream.on("data", (data) => hash.update(data));
+    stream.on("end", () => resolve(hash.digest("hex")));
+    stream.on("error", (err) => reject(err));
   });
-
-  const info = await promise;
-  const actionsVersion = info.version;
-  return `https://github.com/shogo82148/actions-setup-redis/releases/download/v${actionsVersion}/${filename}`;
+  return hash;
 }
