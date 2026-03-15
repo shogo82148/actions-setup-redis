@@ -161,7 +161,7 @@ jobs:
 
 The port number that `redis-server` listens TLS connections.
 
-### redis-tls-port
+### redis-tls-dir
 
 The directory path for TLS sample certificates/keys.
 
