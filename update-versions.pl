@@ -27,7 +27,7 @@ for my $release (@$releases) {
   my @assets = sort { $a->{name} cmp $b->{name} } @{$release->{assets}};
   my @entries;
   for my $asset (@assets) {
-    $asset->{name} =~ /^([a-z]+)-([0-9.]+)-(.*)-(x64|arm64)(?:\.tar\.zstd|\.zip)$/ or next;
+    $asset->{name} =~ /^([a-z]+)-([0-9.]+)-(.*)-(x64|arm64)\.tar\.zstd$/ or next;
     my ($distribution, $version, $os, $arch) = ($1, $2, $3, $4);
     push @entries, {
       distribution => $distribution,
