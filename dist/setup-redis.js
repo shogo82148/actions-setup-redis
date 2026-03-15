@@ -64542,7 +64542,7 @@ async function acquireRedis(distribution, version) {
         else {
             debug(`${error}`);
         }
-        throw new Error(`Failed to download version ${version}: ${error}`);
+        throw new Error(`Failed to download ${version.distribution} ${version.version}: ${error}`);
     }
     //
     // Verify SHA256
@@ -64550,7 +64550,7 @@ async function acquireRedis(distribution, version) {
     info(`verifying the binary...`);
     const hash = await calculateDigest(downloadPath, "sha256");
     if (hash !== version.sha256) {
-        throw new Error(`Hash for downloaded MySQL version ${version.version} (${hash}) does not match expected value (${version.sha256})`);
+        throw new Error(`SHA-256 hash mismatch for ${version.distribution} ${version.version}: got ${hash}, expected ${version.sha256}`);
     }
     //
     // Extract

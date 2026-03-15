@@ -97,7 +97,7 @@ async function acquireRedis(distribution: string, version: Version): Promise<str
       core.debug(`${error}`);
     }
 
-    throw new Error(`Failed to download version ${version}: ${error}`);
+    throw new Error(`Failed to download ${version.distribution} ${version.version}: ${error}`);
   }
 
   //
@@ -107,7 +107,7 @@ async function acquireRedis(distribution: string, version: Version): Promise<str
   const hash = await calculateDigest(downloadPath, "sha256");
   if (hash !== version.sha256) {
     throw new Error(
-      `Hash for downloaded MySQL version ${version.version} (${hash}) does not match expected value (${version.sha256})`,
+      `SHA-256 hash mismatch for ${version.distribution} ${version.version}: got ${hash}, expected ${version.sha256}`,
     );
   }
 
