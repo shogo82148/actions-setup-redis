@@ -34,7 +34,14 @@ function determineVersion(distribution: string, version: string): Version {
     version = version.substring("valkey-".length);
   }
 
-  const availableVersions = distribution === "redis" ? redisVersions : valkeyVersions;
+  let availableVersions: Version[];
+  if (distribution === "redis") {
+    availableVersions = redisVersions;
+  } else if (distribution === "valkey") {
+    availableVersions = valkeyVersions;
+  } else {
+    throw new Error(`unsupported distribution: ${distribution}`);
+  }
 
   if (version === "latest") {
     for (const v of availableVersions) {
