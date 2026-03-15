@@ -5,8 +5,8 @@ import * as path from "path";
 import * as semver from "semver";
 import * as crypto from "crypto";
 import * as tc from "@actions/tool-cache";
-import redisVersions from "../versions/redis.json" with { type: "json" };
-import valkeyVersions from "../versions/valkey.json" with { type: "json" };
+import redisVersions from "./versions/redis.json" with { type: "json" };
+import valkeyVersions from "./versions/valkey.json" with { type: "json" };
 
 const osPlat = os.platform();
 const osArch = os.arch();

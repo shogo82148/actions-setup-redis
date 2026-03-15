@@ -48,10 +48,10 @@ for my $release (@$releases) {
 # Write the collected versions to JSON files
 my $json = JSON::PP->new->utf8->indent->indent_length(2)->space_after->canonical;
 
-open my $fh, ">", "versions/redis.json" or die $!;
+open my $fh, ">", "src/versions/redis.json" or die $!;
 print $fh $json->encode($redis_versions);
 close $fh;
 
-open $fh, ">", "versions/valkey.json" or die $!;
+open $fh, ">", "src/versions/valkey.json" or die $!;
 print $fh $json->encode($valkey_versions);
 close $fh;
