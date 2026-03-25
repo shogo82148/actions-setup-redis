@@ -2,9 +2,8 @@ import * as os from 'os';
 import os__default from 'os';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import fs__default, { promises } from 'fs';
+import { promises } from 'fs';
 import * as path from 'path';
-import path__default from 'path';
 import * as http from 'http';
 import http__default from 'http';
 import * as https from 'https';
@@ -13,7 +12,7 @@ import 'net';
 import require$$1 from 'tls';
 import * as events$2 from 'events';
 import events__default from 'events';
-import require$$5$4, { ok } from 'assert';
+import { ok } from 'assert';
 import * as require$$6 from 'util';
 import require$$6__default from 'util';
 import require$$0$1 from 'node:assert';
@@ -27967,7 +27966,7 @@ var MediaTypes$1;
 };
 const { access, appendFile, writeFile } = promises;
 
-var __awaiter$9 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$7 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -27976,14 +27975,36 @@ var __awaiter$9 = (undefined && undefined.__awaiter) || function (thisArg, _argu
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { chmod: chmod$1, copyFile: copyFile$2, lstat: lstat$1, mkdir: mkdir$1, open: open$1, readdir: readdir$1, rename: rename$1, rm: rm$1, rmdir: rmdir$1, stat: stat$1, symlink: symlink$1, unlink: unlink$1 } = fs.promises;
+const { chmod, copyFile: copyFile$1, lstat, mkdir, open, readdir, rename, rm, rmdir, stat, symlink, unlink } = fs.promises;
 // export const {open} = 'fs'
-const IS_WINDOWS$3 = process.platform === 'win32';
+const IS_WINDOWS$2 = process.platform === 'win32';
+/**
+ * Custom implementation of readlink to ensure Windows junctions
+ * maintain trailing backslash for backward compatibility with Node.js < 24
+ *
+ * In Node.js 20, Windows junctions (directory symlinks) always returned paths
+ * with trailing backslashes. Node.js 24 removed this behavior, which breaks
+ * code that relied on this format for path operations.
+ *
+ * This implementation restores the Node 20 behavior by adding a trailing
+ * backslash to all junction results on Windows.
+ */
+function readlink(fsPath) {
+    return __awaiter$7(this, void 0, void 0, function* () {
+        const result = yield fs.promises.readlink(fsPath);
+        // On Windows, restore Node 20 behavior: add trailing backslash to all results
+        // since junctions on Windows are always directory links
+        if (IS_WINDOWS$2 && !result.endsWith('\\')) {
+            return `${result}\\`;
+        }
+        return result;
+    });
+}
 fs.constants.O_RDONLY;
-function exists$2(fsPath) {
-    return __awaiter$9(this, void 0, void 0, function* () {
+function exists$1(fsPath) {
+    return __awaiter$7(this, void 0, void 0, function* () {
         try {
-            yield stat$1(fsPath);
+            yield stat(fsPath);
         }
         catch (err) {
             if (err.code === 'ENOENT') {
@@ -28003,7 +28024,7 @@ function isRooted(p) {
     if (!p) {
         throw new Error('isRooted() parameter "p" cannot be empty');
     }
-    if (IS_WINDOWS$3) {
+    if (IS_WINDOWS$2) {
         return (p.startsWith('\\') || /^[A-Z]:/i.test(p) // e.g. \ or \hello or \\hello
         ); // e.g. C: or C:\hello
     }
@@ -28016,11 +28037,11 @@ function isRooted(p) {
  * @return if file exists and is executable, returns the file path. otherwise empty string.
  */
 function tryGetExecutablePath(filePath, extensions) {
-    return __awaiter$9(this, void 0, void 0, function* () {
+    return __awaiter$7(this, void 0, void 0, function* () {
         let stats = undefined;
         try {
             // test file exists
-            stats = yield stat$1(filePath);
+            stats = yield stat(filePath);
         }
         catch (err) {
             if (err.code !== 'ENOENT') {
@@ -28029,7 +28050,7 @@ function tryGetExecutablePath(filePath, extensions) {
             }
         }
         if (stats && stats.isFile()) {
-            if (IS_WINDOWS$3) {
+            if (IS_WINDOWS$2) {
                 // on Windows, test for valid extension
                 const upperExt = path.extname(filePath).toUpperCase();
                 if (extensions.some(validExt => validExt.toUpperCase() === upperExt)) {
@@ -28048,7 +28069,7 @@ function tryGetExecutablePath(filePath, extensions) {
             filePath = originalFilePath + extension;
             stats = undefined;
             try {
-                stats = yield stat$1(filePath);
+                stats = yield stat(filePath);
             }
             catch (err) {
                 if (err.code !== 'ENOENT') {
@@ -28057,12 +28078,12 @@ function tryGetExecutablePath(filePath, extensions) {
                 }
             }
             if (stats && stats.isFile()) {
-                if (IS_WINDOWS$3) {
+                if (IS_WINDOWS$2) {
                     // preserve the case of the actual file (since an extension was appended)
                     try {
                         const directory = path.dirname(filePath);
                         const upperName = path.basename(filePath).toUpperCase();
-                        for (const actualName of yield readdir$1(directory)) {
+                        for (const actualName of yield readdir(directory)) {
                             if (upperName === actualName.toUpperCase()) {
                                 filePath = path.join(directory, actualName);
                                 break;
@@ -28087,7 +28108,7 @@ function tryGetExecutablePath(filePath, extensions) {
 }
 function normalizeSeparators(p) {
     p = p || '';
-    if (IS_WINDOWS$3) {
+    if (IS_WINDOWS$2) {
         // convert slashes on Windows
         p = p.replace(/\//g, '\\');
         // remove redundant slashes
@@ -28109,7 +28130,7 @@ function isUnixExecutable(stats) {
             stats.uid === process.getuid()));
 }
 
-var __awaiter$8 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$6 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -28119,6 +28140,88 @@ var __awaiter$8 = (undefined && undefined.__awaiter) || function (thisArg, _argu
     });
 };
 /**
+ * Copies a file or folder.
+ * Based off of shelljs - https://github.com/shelljs/shelljs/blob/9237f66c52e5daa40458f94f9565e18e8132f5a6/src/cp.js
+ *
+ * @param     source    source path
+ * @param     dest      destination path
+ * @param     options   optional. See CopyOptions.
+ */
+function cp(source_1, dest_1) {
+    return __awaiter$6(this, arguments, void 0, function* (source, dest, options = {}) {
+        const { force, recursive, copySourceDirectory } = readCopyOptions(options);
+        const destStat = (yield exists$1(dest)) ? yield stat(dest) : null;
+        // Dest is an existing file, but not forcing
+        if (destStat && destStat.isFile() && !force) {
+            return;
+        }
+        // If dest is an existing directory, should copy inside.
+        const newDest = destStat && destStat.isDirectory() && copySourceDirectory
+            ? path.join(dest, path.basename(source))
+            : dest;
+        if (!(yield exists$1(source))) {
+            throw new Error(`no such file or directory: ${source}`);
+        }
+        const sourceStat = yield stat(source);
+        if (sourceStat.isDirectory()) {
+            if (!recursive) {
+                throw new Error(`Failed to copy. ${source} is a directory, but tried to copy without recursive flag.`);
+            }
+            else {
+                yield cpDirRecursive(source, newDest, 0, force);
+            }
+        }
+        else {
+            if (path.relative(source, newDest) === '') {
+                // a file cannot be copied to itself
+                throw new Error(`'${newDest}' and '${source}' are the same file`);
+            }
+            yield copyFile(source, newDest, force);
+        }
+    });
+}
+/**
+ * Remove a path recursively with force
+ *
+ * @param inputPath path to remove
+ */
+function rmRF(inputPath) {
+    return __awaiter$6(this, void 0, void 0, function* () {
+        if (IS_WINDOWS$2) {
+            // Check for invalid characters
+            // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+            if (/[*"<>|]/.test(inputPath)) {
+                throw new Error('File path must not contain `*`, `"`, `<`, `>` or `|` on Windows');
+            }
+        }
+        try {
+            // note if path does not exist, error is silent
+            yield rm(inputPath, {
+                force: true,
+                maxRetries: 3,
+                recursive: true,
+                retryDelay: 300
+            });
+        }
+        catch (err) {
+            throw new Error(`File was unable to be removed ${err}`);
+        }
+    });
+}
+/**
+ * Make a directory.  Creates the full path with folders in between
+ * Will throw if it fails
+ *
+ * @param   fsPath        path to create
+ * @returns Promise<void>
+ */
+function mkdirP(fsPath) {
+    return __awaiter$6(this, void 0, void 0, function* () {
+        ok(fsPath, 'a path argument must be provided');
+        yield mkdir(fsPath, { recursive: true });
+    });
+}
+/**
  * Returns path of a tool had the tool actually been invoked.  Resolves via paths.
  * If you check and the tool does not exist, it will throw.
  *
@@ -28127,7 +28230,7 @@ var __awaiter$8 = (undefined && undefined.__awaiter) || function (thisArg, _argu
  * @returns   Promise<string>   path to tool
  */
 function which(tool, check) {
-    return __awaiter$8(this, void 0, void 0, function* () {
+    return __awaiter$6(this, void 0, void 0, function* () {
         if (!tool) {
             throw new Error("parameter 'tool' is required");
         }
@@ -28135,7 +28238,7 @@ function which(tool, check) {
         if (check) {
             const result = yield which(tool, false);
             if (!result) {
-                if (IS_WINDOWS$3) {
+                if (IS_WINDOWS$2) {
                     throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also verify the file has a valid extension for an executable file.`);
                 }
                 else {
@@ -28157,13 +28260,13 @@ function which(tool, check) {
  * @returns   Promise<string[]>  the paths of the tool
  */
 function findInPath(tool) {
-    return __awaiter$8(this, void 0, void 0, function* () {
+    return __awaiter$6(this, void 0, void 0, function* () {
         if (!tool) {
             throw new Error("parameter 'tool' is required");
         }
         // build the list of extensions to try
         const extensions = [];
-        if (IS_WINDOWS$3 && process.env['PATHEXT']) {
+        if (IS_WINDOWS$2 && process.env['PATHEXT']) {
             for (const extension of process.env['PATHEXT'].split(path.delimiter)) {
                 if (extension) {
                     extensions.push(extension);
@@ -28207,8 +28310,66 @@ function findInPath(tool) {
         return matches;
     });
 }
+function readCopyOptions(options) {
+    const force = options.force == null ? true : options.force;
+    const recursive = Boolean(options.recursive);
+    const copySourceDirectory = options.copySourceDirectory == null
+        ? true
+        : Boolean(options.copySourceDirectory);
+    return { force, recursive, copySourceDirectory };
+}
+function cpDirRecursive(sourceDir, destDir, currentDepth, force) {
+    return __awaiter$6(this, void 0, void 0, function* () {
+        // Ensure there is not a run away recursive copy
+        if (currentDepth >= 255)
+            return;
+        currentDepth++;
+        yield mkdirP(destDir);
+        const files = yield readdir(sourceDir);
+        for (const fileName of files) {
+            const srcFile = `${sourceDir}/${fileName}`;
+            const destFile = `${destDir}/${fileName}`;
+            const srcFileStat = yield lstat(srcFile);
+            if (srcFileStat.isDirectory()) {
+                // Recurse
+                yield cpDirRecursive(srcFile, destFile, currentDepth, force);
+            }
+            else {
+                yield copyFile(srcFile, destFile, force);
+            }
+        }
+        // Change the mode for the newly created directory
+        yield chmod(destDir, (yield stat(sourceDir)).mode);
+    });
+}
+// Buffered file copy
+function copyFile(srcFile, destFile, force) {
+    return __awaiter$6(this, void 0, void 0, function* () {
+        if ((yield lstat(srcFile)).isSymbolicLink()) {
+            // unlink/re-link it
+            try {
+                yield lstat(destFile);
+                yield unlink(destFile);
+            }
+            catch (e) {
+                // Try to override file permission
+                if (e.code === 'EPERM') {
+                    yield chmod(destFile, '0666');
+                    yield unlink(destFile);
+                }
+                // other errors = it doesn't exist, no work to do
+            }
+            // Copy over symlink
+            const symlinkFull = yield readlink(srcFile);
+            yield symlink(symlinkFull, destFile, IS_WINDOWS$2 ? 'junction' : null);
+        }
+        else if (!(yield exists$1(destFile)) || force) {
+            yield copyFile$1(srcFile, destFile);
+        }
+    });
+}
 
-var __awaiter$7 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$5 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -28218,7 +28379,7 @@ var __awaiter$7 = (undefined && undefined.__awaiter) || function (thisArg, _argu
     });
 };
 /* eslint-disable @typescript-eslint/unbound-method */
-const IS_WINDOWS$2 = process.platform === 'win32';
+const IS_WINDOWS$1 = process.platform === 'win32';
 /*
  * Class for running command line tools. Handles quoting and arg parsing in a platform agnostic way.
  */
@@ -28241,7 +28402,7 @@ class ToolRunner extends events$2.EventEmitter {
         const toolPath = this._getSpawnFileName();
         const args = this._getSpawnArgs(options);
         let cmd = noPrefix ? '' : '[command]'; // omit prefix when piped to a second tool
-        if (IS_WINDOWS$2) {
+        if (IS_WINDOWS$1) {
             // Windows + cmd file
             if (this._isCmdFile()) {
                 cmd += toolPath;
@@ -28295,7 +28456,7 @@ class ToolRunner extends events$2.EventEmitter {
         }
     }
     _getSpawnFileName() {
-        if (IS_WINDOWS$2) {
+        if (IS_WINDOWS$1) {
             if (this._isCmdFile()) {
                 return process.env['COMSPEC'] || 'cmd.exe';
             }
@@ -28303,7 +28464,7 @@ class ToolRunner extends events$2.EventEmitter {
         return this.toolPath;
     }
     _getSpawnArgs(options) {
-        if (IS_WINDOWS$2) {
+        if (IS_WINDOWS$1) {
             if (this._isCmdFile()) {
                 let argline = `/D /S /C "${this._windowsQuoteCmdArg(this.toolPath)}`;
                 for (const a of this.args) {
@@ -28556,18 +28717,18 @@ class ToolRunner extends events$2.EventEmitter {
      * @returns   number
      */
     exec() {
-        return __awaiter$7(this, void 0, void 0, function* () {
+        return __awaiter$5(this, void 0, void 0, function* () {
             // root the tool path if it is unrooted and contains relative pathing
             if (!isRooted(this.toolPath) &&
                 (this.toolPath.includes('/') ||
-                    (IS_WINDOWS$2 && this.toolPath.includes('\\')))) {
+                    (IS_WINDOWS$1 && this.toolPath.includes('\\')))) {
                 // prefer options.cwd if it is specified, however options.cwd may also need to be rooted
                 this.toolPath = path.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
             }
             // if the tool is only a file name, then resolve it from the PATH
             // otherwise verify it exists (add extension on Windows if necessary)
             this.toolPath = yield which(this.toolPath, true);
-            return new Promise((resolve, reject) => __awaiter$7(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => __awaiter$5(this, void 0, void 0, function* () {
                 this._debug(`exec tool: ${this.toolPath}`);
                 this._debug('arguments:');
                 for (const arg of this.args) {
@@ -28581,7 +28742,7 @@ class ToolRunner extends events$2.EventEmitter {
                 state.on('debug', (message) => {
                     this._debug(message);
                 });
-                if (this.options.cwd && !(yield exists$2(this.options.cwd))) {
+                if (this.options.cwd && !(yield exists$1(this.options.cwd))) {
                     return reject(new Error(`The cwd: ${this.options.cwd} does not exist!`));
                 }
                 const fileName = this._getSpawnFileName();
@@ -28788,7 +28949,7 @@ class ExecState extends events$2.EventEmitter {
     }
 }
 
-var __awaiter$6 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$4 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -28808,7 +28969,7 @@ var __awaiter$6 = (undefined && undefined.__awaiter) || function (thisArg, _argu
  * @returns   Promise<number>    exit code
  */
 function exec(commandLine, args, options) {
-    return __awaiter$6(this, void 0, void 0, function* () {
+    return __awaiter$4(this, void 0, void 0, function* () {
         const commandArgs = argStringToArray(commandLine);
         if (commandArgs.length === 0) {
             throw new Error(`Parameter 'commandLine' cannot be null or empty.`);
@@ -28831,7 +28992,7 @@ function exec(commandLine, args, options) {
  * @returns   Promise<ExecOutput>   exit code, stdout, and stderr
  */
 function getExecOutput(commandLine, args, options) {
-    return __awaiter$6(this, void 0, void 0, function* () {
+    return __awaiter$4(this, void 0, void 0, function* () {
         var _a, _b;
         let stdout = '';
         let stderr = '';
@@ -28877,7 +29038,7 @@ function getExecOutput(commandLine, args, options) {
 os__default.platform();
 os__default.arch();
 
-var __awaiter$5 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -29037,7 +29198,7 @@ function endGroup() {
  * @param fn The function to wrap in the group
  */
 function group(name, fn) {
-    return __awaiter$5(this, void 0, void 0, function* () {
+    return __awaiter$3(this, void 0, void 0, function* () {
         startGroup(name);
         let result;
         try {
@@ -31786,206 +31947,6 @@ function requireSemver () {
 }
 
 var semverExports = requireSemver();
-
-var __awaiter$4 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-const { chmod, copyFile: copyFile$1, lstat, mkdir, open, readdir, rename, rm, rmdir, stat, symlink, unlink } = fs.promises;
-// export const {open} = 'fs'
-const IS_WINDOWS$1 = process.platform === 'win32';
-/**
- * Custom implementation of readlink to ensure Windows junctions
- * maintain trailing backslash for backward compatibility with Node.js < 24
- *
- * In Node.js 20, Windows junctions (directory symlinks) always returned paths
- * with trailing backslashes. Node.js 24 removed this behavior, which breaks
- * code that relied on this format for path operations.
- *
- * This implementation restores the Node 20 behavior by adding a trailing
- * backslash to all junction results on Windows.
- */
-function readlink(fsPath) {
-    return __awaiter$4(this, void 0, void 0, function* () {
-        const result = yield fs.promises.readlink(fsPath);
-        // On Windows, restore Node 20 behavior: add trailing backslash to all results
-        // since junctions on Windows are always directory links
-        if (IS_WINDOWS$1 && !result.endsWith('\\')) {
-            return `${result}\\`;
-        }
-        return result;
-    });
-}
-fs.constants.O_RDONLY;
-function exists$1(fsPath) {
-    return __awaiter$4(this, void 0, void 0, function* () {
-        try {
-            yield stat(fsPath);
-        }
-        catch (err) {
-            if (err.code === 'ENOENT') {
-                return false;
-            }
-            throw err;
-        }
-        return true;
-    });
-}
-
-var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-/**
- * Copies a file or folder.
- * Based off of shelljs - https://github.com/shelljs/shelljs/blob/9237f66c52e5daa40458f94f9565e18e8132f5a6/src/cp.js
- *
- * @param     source    source path
- * @param     dest      destination path
- * @param     options   optional. See CopyOptions.
- */
-function cp(source_1, dest_1) {
-    return __awaiter$3(this, arguments, void 0, function* (source, dest, options = {}) {
-        const { force, recursive, copySourceDirectory } = readCopyOptions(options);
-        const destStat = (yield exists$1(dest)) ? yield stat(dest) : null;
-        // Dest is an existing file, but not forcing
-        if (destStat && destStat.isFile() && !force) {
-            return;
-        }
-        // If dest is an existing directory, should copy inside.
-        const newDest = destStat && destStat.isDirectory() && copySourceDirectory
-            ? path.join(dest, path.basename(source))
-            : dest;
-        if (!(yield exists$1(source))) {
-            throw new Error(`no such file or directory: ${source}`);
-        }
-        const sourceStat = yield stat(source);
-        if (sourceStat.isDirectory()) {
-            if (!recursive) {
-                throw new Error(`Failed to copy. ${source} is a directory, but tried to copy without recursive flag.`);
-            }
-            else {
-                yield cpDirRecursive(source, newDest, 0, force);
-            }
-        }
-        else {
-            if (path.relative(source, newDest) === '') {
-                // a file cannot be copied to itself
-                throw new Error(`'${newDest}' and '${source}' are the same file`);
-            }
-            yield copyFile(source, newDest, force);
-        }
-    });
-}
-/**
- * Remove a path recursively with force
- *
- * @param inputPath path to remove
- */
-function rmRF(inputPath) {
-    return __awaiter$3(this, void 0, void 0, function* () {
-        if (IS_WINDOWS$1) {
-            // Check for invalid characters
-            // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
-            if (/[*"<>|]/.test(inputPath)) {
-                throw new Error('File path must not contain `*`, `"`, `<`, `>` or `|` on Windows');
-            }
-        }
-        try {
-            // note if path does not exist, error is silent
-            yield rm(inputPath, {
-                force: true,
-                maxRetries: 3,
-                recursive: true,
-                retryDelay: 300
-            });
-        }
-        catch (err) {
-            throw new Error(`File was unable to be removed ${err}`);
-        }
-    });
-}
-/**
- * Make a directory.  Creates the full path with folders in between
- * Will throw if it fails
- *
- * @param   fsPath        path to create
- * @returns Promise<void>
- */
-function mkdirP(fsPath) {
-    return __awaiter$3(this, void 0, void 0, function* () {
-        ok(fsPath, 'a path argument must be provided');
-        yield mkdir(fsPath, { recursive: true });
-    });
-}
-function readCopyOptions(options) {
-    const force = options.force == null ? true : options.force;
-    const recursive = Boolean(options.recursive);
-    const copySourceDirectory = options.copySourceDirectory == null
-        ? true
-        : Boolean(options.copySourceDirectory);
-    return { force, recursive, copySourceDirectory };
-}
-function cpDirRecursive(sourceDir, destDir, currentDepth, force) {
-    return __awaiter$3(this, void 0, void 0, function* () {
-        // Ensure there is not a run away recursive copy
-        if (currentDepth >= 255)
-            return;
-        currentDepth++;
-        yield mkdirP(destDir);
-        const files = yield readdir(sourceDir);
-        for (const fileName of files) {
-            const srcFile = `${sourceDir}/${fileName}`;
-            const destFile = `${destDir}/${fileName}`;
-            const srcFileStat = yield lstat(srcFile);
-            if (srcFileStat.isDirectory()) {
-                // Recurse
-                yield cpDirRecursive(srcFile, destFile, currentDepth, force);
-            }
-            else {
-                yield copyFile(srcFile, destFile, force);
-            }
-        }
-        // Change the mode for the newly created directory
-        yield chmod(destDir, (yield stat(sourceDir)).mode);
-    });
-}
-// Buffered file copy
-function copyFile(srcFile, destFile, force) {
-    return __awaiter$3(this, void 0, void 0, function* () {
-        if ((yield lstat(srcFile)).isSymbolicLink()) {
-            // unlink/re-link it
-            try {
-                yield lstat(destFile);
-                yield unlink(destFile);
-            }
-            catch (e) {
-                // Try to override file permission
-                if (e.code === 'EPERM') {
-                    yield chmod(destFile, '0666');
-                    yield unlink(destFile);
-                }
-                // other errors = it doesn't exist, no work to do
-            }
-            // Copy over symlink
-            const symlinkFull = yield readlink(srcFile);
-            yield symlink(symlinkFull, destFile, IS_WINDOWS$1 ? 'junction' : null);
-        }
-        else if (!(yield exists$1(destFile)) || force) {
-            yield copyFile$1(srcFile, destFile);
-        }
-    });
-}
 
 (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -66490,567 +66451,9 @@ async function calculateDigest(filename, algorithm) {
     return hash;
 }
 
-var io = {};
-
-var ioUtil = {};
-
-var hasRequiredIoUtil;
-
-function requireIoUtil () {
-	if (hasRequiredIoUtil) return ioUtil;
-	hasRequiredIoUtil = 1;
-	(function (exports$1) {
-		var __createBinding = (ioUtil && ioUtil.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-		    if (k2 === undefined) k2 = k;
-		    var desc = Object.getOwnPropertyDescriptor(m, k);
-		    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-		      desc = { enumerable: true, get: function() { return m[k]; } };
-		    }
-		    Object.defineProperty(o, k2, desc);
-		}) : (function(o, m, k, k2) {
-		    if (k2 === undefined) k2 = k;
-		    o[k2] = m[k];
-		}));
-		var __setModuleDefault = (ioUtil && ioUtil.__setModuleDefault) || (Object.create ? (function(o, v) {
-		    Object.defineProperty(o, "default", { enumerable: true, value: v });
-		}) : function(o, v) {
-		    o["default"] = v;
-		});
-		var __importStar = (ioUtil && ioUtil.__importStar) || (function () {
-		    var ownKeys = function(o) {
-		        ownKeys = Object.getOwnPropertyNames || function (o) {
-		            var ar = [];
-		            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-		            return ar;
-		        };
-		        return ownKeys(o);
-		    };
-		    return function (mod) {
-		        if (mod && mod.__esModule) return mod;
-		        var result = {};
-		        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-		        __setModuleDefault(result, mod);
-		        return result;
-		    };
-		})();
-		var __awaiter = (ioUtil && ioUtil.__awaiter) || function (thisArg, _arguments, P, generator) {
-		    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-		    return new (P || (P = Promise))(function (resolve, reject) {
-		        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-		        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-		        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-		        step((generator = generator.apply(thisArg, _arguments || [])).next());
-		    });
-		};
-		var _a;
-		Object.defineProperty(exports$1, "__esModule", { value: true });
-		exports$1.READONLY = exports$1.UV_FS_O_EXLOCK = exports$1.IS_WINDOWS = exports$1.unlink = exports$1.symlink = exports$1.stat = exports$1.rmdir = exports$1.rm = exports$1.rename = exports$1.readdir = exports$1.open = exports$1.mkdir = exports$1.lstat = exports$1.copyFile = exports$1.chmod = void 0;
-		exports$1.readlink = readlink;
-		exports$1.exists = exists;
-		exports$1.isDirectory = isDirectory;
-		exports$1.isRooted = isRooted;
-		exports$1.tryGetExecutablePath = tryGetExecutablePath;
-		exports$1.getCmdPath = getCmdPath;
-		const fs = __importStar(fs__default);
-		const path = __importStar(path__default);
-		_a = fs.promises
-		// export const {open} = 'fs'
-		, exports$1.chmod = _a.chmod, exports$1.copyFile = _a.copyFile, exports$1.lstat = _a.lstat, exports$1.mkdir = _a.mkdir, exports$1.open = _a.open, exports$1.readdir = _a.readdir, exports$1.rename = _a.rename, exports$1.rm = _a.rm, exports$1.rmdir = _a.rmdir, exports$1.stat = _a.stat, exports$1.symlink = _a.symlink, exports$1.unlink = _a.unlink;
-		// export const {open} = 'fs'
-		exports$1.IS_WINDOWS = process.platform === 'win32';
-		/**
-		 * Custom implementation of readlink to ensure Windows junctions
-		 * maintain trailing backslash for backward compatibility with Node.js < 24
-		 *
-		 * In Node.js 20, Windows junctions (directory symlinks) always returned paths
-		 * with trailing backslashes. Node.js 24 removed this behavior, which breaks
-		 * code that relied on this format for path operations.
-		 *
-		 * This implementation restores the Node 20 behavior by adding a trailing
-		 * backslash to all junction results on Windows.
-		 */
-		function readlink(fsPath) {
-		    return __awaiter(this, void 0, void 0, function* () {
-		        const result = yield fs.promises.readlink(fsPath);
-		        // On Windows, restore Node 20 behavior: add trailing backslash to all results
-		        // since junctions on Windows are always directory links
-		        if (exports$1.IS_WINDOWS && !result.endsWith('\\')) {
-		            return `${result}\\`;
-		        }
-		        return result;
-		    });
-		}
-		// See https://github.com/nodejs/node/blob/d0153aee367422d0858105abec186da4dff0a0c5/deps/uv/include/uv/win.h#L691
-		exports$1.UV_FS_O_EXLOCK = 0x10000000;
-		exports$1.READONLY = fs.constants.O_RDONLY;
-		function exists(fsPath) {
-		    return __awaiter(this, void 0, void 0, function* () {
-		        try {
-		            yield (0, exports$1.stat)(fsPath);
-		        }
-		        catch (err) {
-		            if (err.code === 'ENOENT') {
-		                return false;
-		            }
-		            throw err;
-		        }
-		        return true;
-		    });
-		}
-		function isDirectory(fsPath_1) {
-		    return __awaiter(this, arguments, void 0, function* (fsPath, useStat = false) {
-		        const stats = useStat ? yield (0, exports$1.stat)(fsPath) : yield (0, exports$1.lstat)(fsPath);
-		        return stats.isDirectory();
-		    });
-		}
-		/**
-		 * On OSX/Linux, true if path starts with '/'. On Windows, true for paths like:
-		 * \, \hello, \\hello\share, C:, and C:\hello (and corresponding alternate separator cases).
-		 */
-		function isRooted(p) {
-		    p = normalizeSeparators(p);
-		    if (!p) {
-		        throw new Error('isRooted() parameter "p" cannot be empty');
-		    }
-		    if (exports$1.IS_WINDOWS) {
-		        return (p.startsWith('\\') || /^[A-Z]:/i.test(p) // e.g. \ or \hello or \\hello
-		        ); // e.g. C: or C:\hello
-		    }
-		    return p.startsWith('/');
-		}
-		/**
-		 * Best effort attempt to determine whether a file exists and is executable.
-		 * @param filePath    file path to check
-		 * @param extensions  additional file extensions to try
-		 * @return if file exists and is executable, returns the file path. otherwise empty string.
-		 */
-		function tryGetExecutablePath(filePath, extensions) {
-		    return __awaiter(this, void 0, void 0, function* () {
-		        let stats = undefined;
-		        try {
-		            // test file exists
-		            stats = yield (0, exports$1.stat)(filePath);
-		        }
-		        catch (err) {
-		            if (err.code !== 'ENOENT') {
-		                // eslint-disable-next-line no-console
-		                console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
-		            }
-		        }
-		        if (stats && stats.isFile()) {
-		            if (exports$1.IS_WINDOWS) {
-		                // on Windows, test for valid extension
-		                const upperExt = path.extname(filePath).toUpperCase();
-		                if (extensions.some(validExt => validExt.toUpperCase() === upperExt)) {
-		                    return filePath;
-		                }
-		            }
-		            else {
-		                if (isUnixExecutable(stats)) {
-		                    return filePath;
-		                }
-		            }
-		        }
-		        // try each extension
-		        const originalFilePath = filePath;
-		        for (const extension of extensions) {
-		            filePath = originalFilePath + extension;
-		            stats = undefined;
-		            try {
-		                stats = yield (0, exports$1.stat)(filePath);
-		            }
-		            catch (err) {
-		                if (err.code !== 'ENOENT') {
-		                    // eslint-disable-next-line no-console
-		                    console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
-		                }
-		            }
-		            if (stats && stats.isFile()) {
-		                if (exports$1.IS_WINDOWS) {
-		                    // preserve the case of the actual file (since an extension was appended)
-		                    try {
-		                        const directory = path.dirname(filePath);
-		                        const upperName = path.basename(filePath).toUpperCase();
-		                        for (const actualName of yield (0, exports$1.readdir)(directory)) {
-		                            if (upperName === actualName.toUpperCase()) {
-		                                filePath = path.join(directory, actualName);
-		                                break;
-		                            }
-		                        }
-		                    }
-		                    catch (err) {
-		                        // eslint-disable-next-line no-console
-		                        console.log(`Unexpected error attempting to determine the actual case of the file '${filePath}': ${err}`);
-		                    }
-		                    return filePath;
-		                }
-		                else {
-		                    if (isUnixExecutable(stats)) {
-		                        return filePath;
-		                    }
-		                }
-		            }
-		        }
-		        return '';
-		    });
-		}
-		function normalizeSeparators(p) {
-		    p = p || '';
-		    if (exports$1.IS_WINDOWS) {
-		        // convert slashes on Windows
-		        p = p.replace(/\//g, '\\');
-		        // remove redundant slashes
-		        return p.replace(/\\\\+/g, '\\');
-		    }
-		    // remove redundant slashes
-		    return p.replace(/\/\/+/g, '/');
-		}
-		// on Mac/Linux, test the execute bit
-		//     R   W  X  R  W X R W X
-		//   256 128 64 32 16 8 4 2 1
-		function isUnixExecutable(stats) {
-		    return ((stats.mode & 1) > 0 ||
-		        ((stats.mode & 8) > 0 &&
-		            process.getgid !== undefined &&
-		            stats.gid === process.getgid()) ||
-		        ((stats.mode & 64) > 0 &&
-		            process.getuid !== undefined &&
-		            stats.uid === process.getuid()));
-		}
-		// Get the path of cmd.exe in windows
-		function getCmdPath() {
-		    var _a;
-		    return (_a = process.env['COMSPEC']) !== null && _a !== void 0 ? _a : `cmd.exe`;
-		}
-		
-	} (ioUtil));
-	return ioUtil;
-}
-
-var hasRequiredIo;
-
-function requireIo () {
-	if (hasRequiredIo) return io;
-	hasRequiredIo = 1;
-	var __createBinding = (io && io.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    var desc = Object.getOwnPropertyDescriptor(m, k);
-	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-	      desc = { enumerable: true, get: function() { return m[k]; } };
-	    }
-	    Object.defineProperty(o, k2, desc);
-	}) : (function(o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    o[k2] = m[k];
-	}));
-	var __setModuleDefault = (io && io.__setModuleDefault) || (Object.create ? (function(o, v) {
-	    Object.defineProperty(o, "default", { enumerable: true, value: v });
-	}) : function(o, v) {
-	    o["default"] = v;
-	});
-	var __importStar = (io && io.__importStar) || (function () {
-	    var ownKeys = function(o) {
-	        ownKeys = Object.getOwnPropertyNames || function (o) {
-	            var ar = [];
-	            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-	            return ar;
-	        };
-	        return ownKeys(o);
-	    };
-	    return function (mod) {
-	        if (mod && mod.__esModule) return mod;
-	        var result = {};
-	        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-	        __setModuleDefault(result, mod);
-	        return result;
-	    };
-	})();
-	var __awaiter = (io && io.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(io, "__esModule", { value: true });
-	io.cp = cp;
-	io.mv = mv;
-	io.rmRF = rmRF;
-	io.mkdirP = mkdirP;
-	io.which = which;
-	io.findInPath = findInPath;
-	const assert_1 = require$$5$4;
-	const path = __importStar(path__default);
-	const ioUtil = __importStar(requireIoUtil());
-	/**
-	 * Copies a file or folder.
-	 * Based off of shelljs - https://github.com/shelljs/shelljs/blob/9237f66c52e5daa40458f94f9565e18e8132f5a6/src/cp.js
-	 *
-	 * @param     source    source path
-	 * @param     dest      destination path
-	 * @param     options   optional. See CopyOptions.
-	 */
-	function cp(source_1, dest_1) {
-	    return __awaiter(this, arguments, void 0, function* (source, dest, options = {}) {
-	        const { force, recursive, copySourceDirectory } = readCopyOptions(options);
-	        const destStat = (yield ioUtil.exists(dest)) ? yield ioUtil.stat(dest) : null;
-	        // Dest is an existing file, but not forcing
-	        if (destStat && destStat.isFile() && !force) {
-	            return;
-	        }
-	        // If dest is an existing directory, should copy inside.
-	        const newDest = destStat && destStat.isDirectory() && copySourceDirectory
-	            ? path.join(dest, path.basename(source))
-	            : dest;
-	        if (!(yield ioUtil.exists(source))) {
-	            throw new Error(`no such file or directory: ${source}`);
-	        }
-	        const sourceStat = yield ioUtil.stat(source);
-	        if (sourceStat.isDirectory()) {
-	            if (!recursive) {
-	                throw new Error(`Failed to copy. ${source} is a directory, but tried to copy without recursive flag.`);
-	            }
-	            else {
-	                yield cpDirRecursive(source, newDest, 0, force);
-	            }
-	        }
-	        else {
-	            if (path.relative(source, newDest) === '') {
-	                // a file cannot be copied to itself
-	                throw new Error(`'${newDest}' and '${source}' are the same file`);
-	            }
-	            yield copyFile(source, newDest, force);
-	        }
-	    });
-	}
-	/**
-	 * Moves a path.
-	 *
-	 * @param     source    source path
-	 * @param     dest      destination path
-	 * @param     options   optional. See MoveOptions.
-	 */
-	function mv(source_1, dest_1) {
-	    return __awaiter(this, arguments, void 0, function* (source, dest, options = {}) {
-	        if (yield ioUtil.exists(dest)) {
-	            let destExists = true;
-	            if (yield ioUtil.isDirectory(dest)) {
-	                // If dest is directory copy src into dest
-	                dest = path.join(dest, path.basename(source));
-	                destExists = yield ioUtil.exists(dest);
-	            }
-	            if (destExists) {
-	                if (options.force == null || options.force) {
-	                    yield rmRF(dest);
-	                }
-	                else {
-	                    throw new Error('Destination already exists');
-	                }
-	            }
-	        }
-	        yield mkdirP(path.dirname(dest));
-	        yield ioUtil.rename(source, dest);
-	    });
-	}
-	/**
-	 * Remove a path recursively with force
-	 *
-	 * @param inputPath path to remove
-	 */
-	function rmRF(inputPath) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        if (ioUtil.IS_WINDOWS) {
-	            // Check for invalid characters
-	            // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
-	            if (/[*"<>|]/.test(inputPath)) {
-	                throw new Error('File path must not contain `*`, `"`, `<`, `>` or `|` on Windows');
-	            }
-	        }
-	        try {
-	            // note if path does not exist, error is silent
-	            yield ioUtil.rm(inputPath, {
-	                force: true,
-	                maxRetries: 3,
-	                recursive: true,
-	                retryDelay: 300
-	            });
-	        }
-	        catch (err) {
-	            throw new Error(`File was unable to be removed ${err}`);
-	        }
-	    });
-	}
-	/**
-	 * Make a directory.  Creates the full path with folders in between
-	 * Will throw if it fails
-	 *
-	 * @param   fsPath        path to create
-	 * @returns Promise<void>
-	 */
-	function mkdirP(fsPath) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        (0, assert_1.ok)(fsPath, 'a path argument must be provided');
-	        yield ioUtil.mkdir(fsPath, { recursive: true });
-	    });
-	}
-	/**
-	 * Returns path of a tool had the tool actually been invoked.  Resolves via paths.
-	 * If you check and the tool does not exist, it will throw.
-	 *
-	 * @param     tool              name of the tool
-	 * @param     check             whether to check if tool exists
-	 * @returns   Promise<string>   path to tool
-	 */
-	function which(tool, check) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        if (!tool) {
-	            throw new Error("parameter 'tool' is required");
-	        }
-	        // recursive when check=true
-	        if (check) {
-	            const result = yield which(tool, false);
-	            if (!result) {
-	                if (ioUtil.IS_WINDOWS) {
-	                    throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also verify the file has a valid extension for an executable file.`);
-	                }
-	                else {
-	                    throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also check the file mode to verify the file is executable.`);
-	                }
-	            }
-	            return result;
-	        }
-	        const matches = yield findInPath(tool);
-	        if (matches && matches.length > 0) {
-	            return matches[0];
-	        }
-	        return '';
-	    });
-	}
-	/**
-	 * Returns a list of all occurrences of the given tool on the system path.
-	 *
-	 * @returns   Promise<string[]>  the paths of the tool
-	 */
-	function findInPath(tool) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        if (!tool) {
-	            throw new Error("parameter 'tool' is required");
-	        }
-	        // build the list of extensions to try
-	        const extensions = [];
-	        if (ioUtil.IS_WINDOWS && process.env['PATHEXT']) {
-	            for (const extension of process.env['PATHEXT'].split(path.delimiter)) {
-	                if (extension) {
-	                    extensions.push(extension);
-	                }
-	            }
-	        }
-	        // if it's rooted, return it if exists. otherwise return empty.
-	        if (ioUtil.isRooted(tool)) {
-	            const filePath = yield ioUtil.tryGetExecutablePath(tool, extensions);
-	            if (filePath) {
-	                return [filePath];
-	            }
-	            return [];
-	        }
-	        // if any path separators, return empty
-	        if (tool.includes(path.sep)) {
-	            return [];
-	        }
-	        // build the list of directories
-	        //
-	        // Note, technically "where" checks the current directory on Windows. From a toolkit perspective,
-	        // it feels like we should not do this. Checking the current directory seems like more of a use
-	        // case of a shell, and the which() function exposed by the toolkit should strive for consistency
-	        // across platforms.
-	        const directories = [];
-	        if (process.env.PATH) {
-	            for (const p of process.env.PATH.split(path.delimiter)) {
-	                if (p) {
-	                    directories.push(p);
-	                }
-	            }
-	        }
-	        // find all matches
-	        const matches = [];
-	        for (const directory of directories) {
-	            const filePath = yield ioUtil.tryGetExecutablePath(path.join(directory, tool), extensions);
-	            if (filePath) {
-	                matches.push(filePath);
-	            }
-	        }
-	        return matches;
-	    });
-	}
-	function readCopyOptions(options) {
-	    const force = options.force == null ? true : options.force;
-	    const recursive = Boolean(options.recursive);
-	    const copySourceDirectory = options.copySourceDirectory == null
-	        ? true
-	        : Boolean(options.copySourceDirectory);
-	    return { force, recursive, copySourceDirectory };
-	}
-	function cpDirRecursive(sourceDir, destDir, currentDepth, force) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        // Ensure there is not a run away recursive copy
-	        if (currentDepth >= 255)
-	            return;
-	        currentDepth++;
-	        yield mkdirP(destDir);
-	        const files = yield ioUtil.readdir(sourceDir);
-	        for (const fileName of files) {
-	            const srcFile = `${sourceDir}/${fileName}`;
-	            const destFile = `${destDir}/${fileName}`;
-	            const srcFileStat = yield ioUtil.lstat(srcFile);
-	            if (srcFileStat.isDirectory()) {
-	                // Recurse
-	                yield cpDirRecursive(srcFile, destFile, currentDepth, force);
-	            }
-	            else {
-	                yield copyFile(srcFile, destFile, force);
-	            }
-	        }
-	        // Change the mode for the newly created directory
-	        yield ioUtil.chmod(destDir, (yield ioUtil.stat(sourceDir)).mode);
-	    });
-	}
-	// Buffered file copy
-	function copyFile(srcFile, destFile, force) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        if ((yield ioUtil.lstat(srcFile)).isSymbolicLink()) {
-	            // unlink/re-link it
-	            try {
-	                yield ioUtil.lstat(destFile);
-	                yield ioUtil.unlink(destFile);
-	            }
-	            catch (e) {
-	                // Try to override file permission
-	                if (e.code === 'EPERM') {
-	                    yield ioUtil.chmod(destFile, '0666');
-	                    yield ioUtil.unlink(destFile);
-	                }
-	                // other errors = it doesn't exist, no work to do
-	            }
-	            // Copy over symlink
-	            const symlinkFull = yield ioUtil.readlink(srcFile);
-	            yield ioUtil.symlink(symlinkFull, destFile, ioUtil.IS_WINDOWS ? 'junction' : null);
-	        }
-	        else if (!(yield ioUtil.exists(destFile)) || force) {
-	            yield ioUtil.copyFile(srcFile, destFile);
-	        }
-	    });
-	}
-	
-	return io;
-}
-
-var ioExports = requireIo();
-
 async function startRedis(opts) {
     const { confPath, redisPath, port, tlsPort, configure } = opts;
-    await ioExports.mkdirP(confPath);
+    await mkdirP(confPath);
     const pid = path.join(confPath, "redis.pid");
     const log = path.join(confPath, "redis.log");
     const conf = path.join(confPath, "redis.conf");
@@ -67132,7 +66535,7 @@ async function generateTestCerts(confPath, tlsPort, redisPath) {
         process.env["OPENSSL_CONF"] = conf;
     }
     const tlsPath = path.join(confPath, "tls");
-    await ioExports.mkdirP(tlsPath);
+    await mkdirP(tlsPath);
     const cacrt = path.join(tlsPath, "ca.crt");
     const cakey = path.join(tlsPath, "ca.key");
     const catxt = path.join(tlsPath, "ca.txt");
