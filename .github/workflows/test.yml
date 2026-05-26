@@ -84,7 +84,7 @@ jobs:
           - "6.2"
 
           # The latest version of Redis
-          - "8.6"
+          - "8.8"
 
           # The latest version of Valkey
           - "valkey-9.0"
