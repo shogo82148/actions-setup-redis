@@ -31,7 +31,7 @@ jobs:
           - "8.6"
 
           # The latest version of Valkey
-          - "valkey-9.0"
+          - "valkey-9.1"
 
     steps:
       - name: Checkout
@@ -89,7 +89,7 @@ jobs:
           - "8.8"
 
           # The latest version of Valkey
-          - "valkey-9.0"
+          - "valkey-9.1"
 
     steps:
       - name: Checkout
