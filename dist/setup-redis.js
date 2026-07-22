@@ -39406,70 +39406,6 @@ var valkeyVersions = [
 		arch: "arm64",
 		distribution: "valkey",
 		os: "darwin",
-		sha256: "42dd7e8a169d95d2b286c27a562fc5521d4615c700ccb300efee2fc849bdabed",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-9.1.1-20260722064923/valkey-9.1.1-darwin-arm64.tar.zstd",
-		version: "9.1.1"
-	},
-	{
-		arch: "x64",
-		distribution: "valkey",
-		os: "darwin",
-		sha256: "4810cf081ac5c36b0f7b5831d24299c7d85ccb46441c7019721c5a7dbda36b4e",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-9.1.1-20260722064923/valkey-9.1.1-darwin-x64.tar.zstd",
-		version: "9.1.1"
-	},
-	{
-		arch: "arm64",
-		distribution: "valkey",
-		os: "linux",
-		sha256: "c11b641227facb720802470b1d0b551a5996604eb7c3fd6fb432c460123d3698",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-9.1.1-20260722064923/valkey-9.1.1-linux-arm64.tar.zstd",
-		version: "9.1.1"
-	},
-	{
-		arch: "x64",
-		distribution: "valkey",
-		os: "linux",
-		sha256: "b68439f1cf08e6572adb4d5e66de1a705ce31f9b8dd1ae160d333940f971b347",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-9.1.1-20260722064923/valkey-9.1.1-linux-x64.tar.zstd",
-		version: "9.1.1"
-	},
-	{
-		arch: "arm64",
-		distribution: "valkey",
-		os: "darwin",
-		sha256: "b2d4f0b3725e1fa052e0859155d359f1e8722b53a92027e35179c4980a94559f",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-9.1.0-20260722064923/valkey-9.1.0-darwin-arm64.tar.zstd",
-		version: "9.1.0"
-	},
-	{
-		arch: "x64",
-		distribution: "valkey",
-		os: "darwin",
-		sha256: "ee8a6609a032859a2a9d916c1f7a58ad05614b7455216d3d771a7029de07e6c0",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-9.1.0-20260722064923/valkey-9.1.0-darwin-x64.tar.zstd",
-		version: "9.1.0"
-	},
-	{
-		arch: "arm64",
-		distribution: "valkey",
-		os: "linux",
-		sha256: "c4c9f188f057f197dcf35855332625320b4234d367169eb687f64e79c6725deb",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-9.1.0-20260722064923/valkey-9.1.0-linux-arm64.tar.zstd",
-		version: "9.1.0"
-	},
-	{
-		arch: "x64",
-		distribution: "valkey",
-		os: "linux",
-		sha256: "93cfa208c725cf0ab4b7673ad8e32cc64fb964c06fa06fd4cc17d405cef540fc",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-9.1.0-20260722064923/valkey-9.1.0-linux-x64.tar.zstd",
-		version: "9.1.0"
-	},
-	{
-		arch: "arm64",
-		distribution: "valkey",
-		os: "darwin",
 		sha256: "bfb6217be2955060702429fc3bd7e09148ece9aef0b9fb6802005def9f43b99d",
 		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-9.0.5-20260722053445/valkey-9.0.5-darwin-arm64.tar.zstd",
 		version: "9.0.5"
@@ -40041,38 +39977,6 @@ var valkeyVersions = [
 		sha256: "919944a4d70c55c3599d516c2c743a15aaf9e5ff692c4e28089a904f8e422ba3",
 		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-8.0.9-20260507142753/valkey-8.0.9-linux-x64.tar.zstd",
 		version: "8.0.9"
-	},
-	{
-		arch: "arm64",
-		distribution: "valkey",
-		os: "darwin",
-		sha256: "d0ed8fb8e8e7060111d76a9198b1d141a171c3557afa579326be0f86fc8c084a",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-8.0.8-20260722064923/valkey-8.0.8-darwin-arm64.tar.zstd",
-		version: "8.0.8"
-	},
-	{
-		arch: "x64",
-		distribution: "valkey",
-		os: "darwin",
-		sha256: "ed42c2d62ee4673748bfadb389a7de22c068ef5d148e60668c1beb09d404b4b9",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-8.0.8-20260722064923/valkey-8.0.8-darwin-x64.tar.zstd",
-		version: "8.0.8"
-	},
-	{
-		arch: "arm64",
-		distribution: "valkey",
-		os: "linux",
-		sha256: "2687563ab76f3533d8971579e05b3306ed7fdc18f8a035ceb53fe992092bf9ab",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-8.0.8-20260722064923/valkey-8.0.8-linux-arm64.tar.zstd",
-		version: "8.0.8"
-	},
-	{
-		arch: "x64",
-		distribution: "valkey",
-		os: "linux",
-		sha256: "18ba7125e6207bc560d0dffd4009b9a0ff1d5d64ba02205333230de0f6d7eb5d",
-		url: "https://github.com/shogo82148/build-redis/releases/download/valkey-8.0.8-20260722064923/valkey-8.0.8-linux-x64.tar.zstd",
-		version: "8.0.8"
 	},
 	{
 		arch: "arm64",
