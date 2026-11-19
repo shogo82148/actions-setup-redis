@@ -89,7 +89,7 @@ jobs:
           - "8.10"
 
           # The latest version of Valkey
-          - "valkey-9.1"
+          - "valkey-9.2"
 
     steps:
       - name: Checkout
