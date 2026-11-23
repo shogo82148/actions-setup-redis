@@ -34388,6 +34388,38 @@ var redisVersions = [
 		arch: "arm64",
 		distribution: "redis",
 		os: "darwin",
+		sha256: "d83e8665c1788bea04626e28ab725fea77dd774c3a8645ce2e1210b1b294c138",
+		url: "https://github.com/shogo82148/build-redis/releases/download/redis-8.12.0-20261122235825/redis-8.12.0-darwin-arm64.tar.zstd",
+		version: "8.12.0"
+	},
+	{
+		arch: "x64",
+		distribution: "redis",
+		os: "darwin",
+		sha256: "c551b0605a87d0cc61f2b2a26705e0b70de40f4f760b94ea084ef9236097acc5",
+		url: "https://github.com/shogo82148/build-redis/releases/download/redis-8.12.0-20261122235825/redis-8.12.0-darwin-x64.tar.zstd",
+		version: "8.12.0"
+	},
+	{
+		arch: "arm64",
+		distribution: "redis",
+		os: "linux",
+		sha256: "b36fb8b3dbbe023259bc04c7cc311eb20e8dd7860fea23d4bf1399f0caf67e54",
+		url: "https://github.com/shogo82148/build-redis/releases/download/redis-8.12.0-20261122235825/redis-8.12.0-linux-arm64.tar.zstd",
+		version: "8.12.0"
+	},
+	{
+		arch: "x64",
+		distribution: "redis",
+		os: "linux",
+		sha256: "b7f65f42fd49fd10a238c4be881c24d647c5d6eaa79b75af58e2b0d8148e5fa5",
+		url: "https://github.com/shogo82148/build-redis/releases/download/redis-8.12.0-20261122235825/redis-8.12.0-linux-x64.tar.zstd",
+		version: "8.12.0"
+	},
+	{
+		arch: "arm64",
+		distribution: "redis",
+		os: "darwin",
 		sha256: "b80fba12fa5dbc2dee1b02a45167508e95b36082efcbe7588e4a374174dffdef",
 		url: "https://github.com/shogo82148/build-redis/releases/download/redis-8.10.3-20261026121512/redis-8.10.3-darwin-arm64.tar.zstd",
 		version: "8.10.3"
