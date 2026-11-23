@@ -177,19 +177,28 @@ async function generateTestCerts(confPath: string, tlsPort: number, redisPath: s
     cacrt,
   ]);
   const opensslCnf = path.join(tlsPath, "openssl.cnf");
+  // Redis 8.12 and later verify the hostname of the server certificate by default,
+  // so the certificates used by the server must carry the local addresses in their Subject Alternative Name.
   await fs.writeFile(
     opensslCnf,
     `[ server_cert ]
 keyUsage = digitalSignature, keyEncipherment
 nsCertType = server
+subjectAltName = @alt_names
 [ client_cert ]
 keyUsage = digitalSignature, keyEncipherment
 nsCertType = client
+[ generic_cert ]
+subjectAltName = @alt_names
+[ alt_names ]
+DNS.1 = localhost
+IP.1 = 127.0.0.1
+IP.2 = ::1
 `,
   );
   await generateCert("server", "Server-only", ["-extfile", opensslCnf, "-extensions", "server_cert"]);
   await generateCert("client", "Client-only", ["-extfile", opensslCnf, "-extensions", "client_cert"]);
-  await generateCert("redis", "Generic-cert", []);
+  await generateCert("redis", "Generic-cert", ["-extfile", opensslCnf, "-extensions", "generic_cert"]);
   await exec.exec("openssl", ["dhparam", "-out", path.join(tlsPath, "redis.dh"), "2048"]);
 
   return `tls-port ${tlsPort}
